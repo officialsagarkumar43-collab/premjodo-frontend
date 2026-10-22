@@ -52,10 +52,25 @@ export function ThemeProvider({ children }) {
     setMounted(true);
   }, []);
 
+  const [systemDark, setSystemDark] = React.useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      setSystemDark(mediaQuery.matches);
+      const handler = (e) => setSystemDark(e.matches);
+      mediaQuery.addEventListener("change", handler);
+      return () => mediaQuery.removeEventListener("change", handler);
+    } catch {}
+  }, []);
+
   let isDark = false;
   if (theme === "dark") {
     isDark = true;
-  } else if (theme === "light") {
+  } else if (theme === "system") {
+    isDark = systemDark;
+  } else {
     isDark = false;
   }
 

@@ -8,6 +8,7 @@ import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
+import authService from "@/lib/services/auth.service";
 import membershipService from "@/lib/services/membership.service";
 import { useIntersectionObserver } from "@/lib/hooks/useIntersectionObserver";
 import "@/styles/subscriptions.css";
@@ -37,7 +38,14 @@ export default function SubscriptionsClient({
 }) {
   const router = useRouter();
   const { t } = useLanguage();
-  const { user, profile, isAuthenticated, subscription, refreshSubscription } = useAuth();
+  const {
+    user,
+    profile,
+    isAuthenticated,
+    subscription,
+    refreshSubscription,
+    isLoading: authLoading,
+  } = useAuth();
 
   // Intersection Observers for smooth reveal animations without viewport layout delay
   const [heroRef, isHeroVisible] = useIntersectionObserver({
@@ -74,7 +82,9 @@ export default function SubscriptionsClient({
       { id: "annual", label: "Annual Billing", discount: "SAVE 33%" },
     ]
   );
-  const [isLoadingPlans, setIsLoadingPlans] = useState(() => plans.length === 0);
+  // Initial loading spinner state until both plans and user subscription status are fetched from API
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [processingPlanSlug, setProcessingPlanSlug] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -90,41 +100,86 @@ export default function SubscriptionsClient({
     setIsAuthOpen(true);
   };
 
-  // If plans were not loaded on SSR or need background refresh on auth changes
+  // Dedicated data loader to fetch fresh plans & active subscription concurrently from API
+  const fetchAllData = useCallback(async () => {
+    setIsLoadingPlans(true);
+    setIsInitialLoading(true);
+    try {
+      const promises = [];
+
+      // 1. Fetch subscription plans and billing cycles from API
+      promises.push(
+        membershipService
+          .getPlansData()
+          .then(({ plans: fetchedPlans, billingCycles: fetchedCycles }) => {
+            if (Array.isArray(fetchedPlans) && fetchedPlans.length > 0) {
+              const sorted = [...fetchedPlans].sort(
+                (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+              );
+              setPlans(sorted);
+            }
+            if (Array.isArray(fetchedCycles) && fetchedCycles.length > 0) {
+              setBillingCycles(fetchedCycles);
+            }
+          })
+          .catch((err) => {
+            console.warn("[SubscriptionsClient] Error fetching plans:", err);
+          })
+      );
+
+      // 2. If authenticated or token exists, fetch current user subscription from API
+      const hasToken =
+        typeof window !== "undefined" &&
+        Boolean(authService.isAuthenticated());
+
+      if (hasToken) {
+        promises.push(
+          refreshSubscription().catch((err) => {
+            console.warn("[SubscriptionsClient] Error refreshing subscription:", err);
+          })
+        );
+      }
+
+      await Promise.all(promises);
+    } catch (err) {
+      console.warn("[SubscriptionsClient] Error loading initial plans data:", err);
+    } finally {
+      setIsLoadingPlans(false);
+      setIsInitialLoading(false);
+    }
+  }, [refreshSubscription]);
+
+  // Initial mount: fetch all data and prevent infinite spinner with fallback timer
   useEffect(() => {
     let isMounted = true;
 
-    if (isAuthenticated) {
-      refreshSubscription();
-    }
+    fetchAllData();
 
-    if (plans.length === 0) {
-      membershipService
-        .getPlansData()
-        .then(({ plans: fetchedPlans, billingCycles: fetchedCycles }) => {
-          if (!isMounted) return;
-          if (Array.isArray(fetchedPlans) && fetchedPlans.length > 0) {
-            const sorted = [...fetchedPlans].sort(
-              (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
-            );
-            setPlans(sorted);
-          }
-          if (Array.isArray(fetchedCycles) && fetchedCycles.length > 0) {
-            setBillingCycles(fetchedCycles);
-          }
-        })
-        .catch((err) => {
-          console.warn("[SubscriptionsClient] Error fetching plans:", err);
-        })
-        .finally(() => {
-          if (isMounted) setIsLoadingPlans(false);
-        });
-    }
+    const fallbackTimer = setTimeout(() => {
+      if (isMounted) {
+        setIsLoadingPlans(false);
+        setIsInitialLoading(false);
+      }
+    }, 6000);
 
     return () => {
       isMounted = false;
+      clearTimeout(fallbackTimer);
     };
-  }, [isAuthenticated, refreshSubscription, plans.length]);
+  }, [fetchAllData]);
+
+  // Keep subscription fresh when auth changes dynamically
+  useEffect(() => {
+    if (isAuthenticated) {
+      refreshSubscription();
+    }
+  }, [isAuthenticated, refreshSubscription]);
+
+  // Unified loading flag: true during initial load or while fetching API data / auth sync
+  const isDataLoading =
+    isInitialLoading ||
+    isLoadingPlans ||
+    (typeof window !== "undefined" && authService.isAuthenticated() && authLoading);
 
   // Memoized sorted plans list
   const sortedPlans = useMemo(() => {
@@ -245,12 +300,17 @@ export default function SubscriptionsClient({
     setErrorMessage("");
     setStatusMessage("");
 
+    // Guard against checkout calls while verifying initial data or processing
+    if (isDataLoading || processingPlanSlug || isVerifying) {
+      return;
+    }
+
     if (!isAuthenticated) {
       openAuth();
       return;
     }
 
-    if (isUserVip) {
+    if (isUserVip || isCurrentPlanActive(plan)) {
       router.push("/user/subscriptions?tab=topups");
       return;
     }
@@ -450,27 +510,36 @@ export default function SubscriptionsClient({
           className={`sub-pricing-section sub-reveal ${isPlansVisible ? "sub-reveal-visible" : ""}`}
         >
           <div className="sub-pricing-container">
-            {isLoadingPlans && sortedPlans.length === 0 ? (
-              <div className="sub-cards-grid">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="sub-skeleton-card">
-                    <div className="sub-skeleton-header">
-                      <div className="sub-skeleton-icon" />
-                      <div className="sub-skeleton-text-group">
-                        <div className="sub-skeleton-bar sub-skel-title" />
-                        <div className="sub-skeleton-bar sub-skel-sub" />
-                      </div>
-                    </div>
-                    <div className="sub-skeleton-bar sub-skel-desc" />
-                    <div className="sub-skeleton-bar sub-skel-price" />
-                    <div className="sub-skel-features">
-                      <div className="sub-skeleton-bar sub-skel-line-1" />
-                      <div className="sub-skeleton-bar sub-skel-line-2" />
-                      <div className="sub-skeleton-bar sub-skel-line-3" />
-                    </div>
-                    <div className="sub-skeleton-btn" />
-                  </div>
-                ))}
+            {isDataLoading ? (
+              <div className="sub-plans-loading-wrapper">
+                <div className="sub-plans-spinner-container">
+                  <div className="sub-plans-spinner-ring" />
+                  <div className="sub-plans-spinner-glow" />
+                  <Crown className="sub-plans-spinner-icon" />
+                </div>
+                <div className="sub-plans-loading-content">
+                  <h3 className="sub-plans-loading-heading">Loading Membership Plans...</h3>
+                </div>
+                <div className="sub-plans-loading-dots">
+                  <span className="sub-loading-dot" />
+                  <span className="sub-loading-dot" />
+                  <span className="sub-loading-dot" />
+                </div>
+              </div>
+            ) : sortedPlans.length === 0 ? (
+              <div className="sub-plans-empty-wrapper">
+                <AlertCircle className="w-10 h-10 text-amber-500 mb-2" />
+                <h3 className="sub-plans-loading-heading">Unable to Load Plans</h3>
+                <p className="sub-plans-loading-subtitle">
+                  We could not fetch the subscription plans right now. Please try again.
+                </p>
+                <button
+                  type="button"
+                  onClick={fetchAllData}
+                  className="sub-retry-btn"
+                >
+                  Reload Plans
+                </button>
               </div>
             ) : (
               <div className="sub-cards-grid">
@@ -497,13 +566,12 @@ export default function SubscriptionsClient({
                   return (
                     <div
                       key={plan.slug || plan._id}
-                      className={`sub-card stagger-${(index % 3) + 1} ${
-                        isUserActivePlan
-                          ? "sub-card-active"
-                          : isPopular
+                      className={`sub-card stagger-${(index % 3) + 1} ${isUserActivePlan
+                        ? "sub-card-active"
+                        : isPopular
                           ? "sub-card-popular"
                           : ""
-                      }`}
+                        }`}
                     >
                       {isUserActivePlan ? (
                         <span className="sub-card-badge sub-card-badge-active">
@@ -512,9 +580,8 @@ export default function SubscriptionsClient({
                         </span>
                       ) : badgeText ? (
                         <span
-                          className={`sub-card-badge ${
-                            isPopular ? "sub-card-badge-popular" : "sub-card-badge-generic"
-                          }`}
+                          className={`sub-card-badge ${isPopular ? "sub-card-badge-popular" : "sub-card-badge-generic"
+                            }`}
                         >
                           {badgeText}
                         </span>
@@ -577,27 +644,36 @@ export default function SubscriptionsClient({
 
                       <button
                         onClick={() => {
+                          if (isDataLoading) return;
                           if (isUserVip && !isUserActivePlan) {
                             router.push("/user/subscriptions?tab=topups");
                             return;
                           }
                           handleSubscribe(plan);
                         }}
-                        disabled={isProcessing || isUserActivePlan}
-                        className={`sub-cta-btn ${
-                          isUserActivePlan
-                            ? "sub-cta-active"
-                            : isUserVip
+                        disabled={
+                          isProcessing ||
+                          isUserActivePlan ||
+                          isDataLoading
+                        }
+                        className={`sub-cta-btn ${isUserActivePlan
+                          ? "sub-cta-active"
+                          : isUserVip
                             ? "sub-cta-vip"
                             : isPopular
-                            ? "sub-cta-popular"
-                            : "sub-cta-standard"
-                        }`}
+                              ? "sub-cta-popular"
+                              : "sub-cta-standard"
+                          }`}
                       >
                         {isProcessing ? (
                           <>
                             <Loader2 className="sub-spinner" />
                             <span>Securing Checkout...</span>
+                          </>
+                        ) : isDataLoading ? (
+                          <>
+                            <Loader2 className="sub-spinner" />
+                            <span>Checking Plan...</span>
                           </>
                         ) : isUserActivePlan ? (
                           <span>Currently Subscribed</span>
@@ -665,9 +741,8 @@ export default function SubscriptionsClient({
                 return (
                   <div
                     key={idx}
-                    className={`sub-faq-item stagger-${(idx % 5) + 1} ${
-                      isOpen ? "sub-faq-item-open" : ""
-                    }`}
+                    className={`sub-faq-item stagger-${(idx % 5) + 1} ${isOpen ? "sub-faq-item-open" : ""
+                      }`}
                   >
                     <button
                       type="button"

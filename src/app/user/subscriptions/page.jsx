@@ -351,36 +351,45 @@ export default function UserSubscriptionsPage() {
   // Load plans & addons & refresh subscription on mount
   useEffect(() => {
     let isMounted = true;
-    refreshSubscription();
 
-    // 1. Load Membership Plans
-    membershipService
-      .getPlansData()
-      .then(({ plans: fetchedPlans, addons: fetchedAddonsFromPlans, billingCycles: fetchedCycles }) => {
-        if (!isMounted) return;
-        if (Array.isArray(fetchedPlans) && fetchedPlans.length > 0) {
-          const sorted = [...fetchedPlans].sort(
-            (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
-          );
-          setPlans(sorted);
-        }
-        if (Array.isArray(fetchedCycles) && fetchedCycles.length > 0) {
-          setBillingCycles(fetchedCycles);
-        }
-        if (Array.isArray(fetchedAddonsFromPlans) && fetchedAddonsFromPlans.length > 0) {
-          const sorted = [...fetchedAddonsFromPlans].sort(
-            (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
-          );
-          setAddons(sorted);
-          setIsLoadingAddons(false);
-        }
-      })
-      .catch((err) => {
-        console.warn("[UserSubscriptions] Error fetching plans:", err);
-      })
-      .finally(() => {
+    // Concurrently load subscription and plans before clearing loading state
+    const loadPlansAndSubscription = async () => {
+      try {
+        await Promise.all([
+          refreshSubscription().catch((err) => {
+            console.warn("[UserSubscriptions] Error refreshing subscription:", err);
+          }),
+          membershipService
+            .getPlansData()
+            .then(({ plans: fetchedPlans, addons: fetchedAddonsFromPlans, billingCycles: fetchedCycles }) => {
+              if (!isMounted) return;
+              if (Array.isArray(fetchedPlans) && fetchedPlans.length > 0) {
+                const sorted = [...fetchedPlans].sort(
+                  (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+                );
+                setPlans(sorted);
+              }
+              if (Array.isArray(fetchedCycles) && fetchedCycles.length > 0) {
+                setBillingCycles(fetchedCycles);
+              }
+              if (Array.isArray(fetchedAddonsFromPlans) && fetchedAddonsFromPlans.length > 0) {
+                const sorted = [...fetchedAddonsFromPlans].sort(
+                  (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
+                );
+                setAddons(sorted);
+                setIsLoadingAddons(false);
+              }
+            })
+            .catch((err) => {
+              console.warn("[UserSubscriptions] Error fetching plans:", err);
+            }),
+        ]);
+      } finally {
         if (isMounted) setIsLoadingPlans(false);
-      });
+      }
+    };
+
+    loadPlansAndSubscription();
 
     // 2. Load Membership Add-ons directly from /membership/addons
     membershipService
@@ -498,7 +507,7 @@ export default function UserSubscriptionsPage() {
     setErrorMessage("");
     setStatusMessage("");
 
-    if (isUserVip) {
+    if (isLoadingPlans || isUserVip || isCurrentPlanActive(plan)) {
       setActiveTab("topups");
       setStatusMessage("You already have an active VIP subscription! You can add extra credits from the Top-Up Store.");
       return;
@@ -1398,9 +1407,32 @@ export default function UserSubscriptionsPage() {
 
           {/* Plans Grid */}
           {isLoadingPlans ? (
-            <div className="py-16 flex flex-col items-center justify-center text-center space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
-              <p className="text-xs text-zinc-500">Loading VIP subscription plans...</p>
+            <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 rounded-3xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-dashed border-zinc-200 dark:border-zinc-800">
+              <div className="relative w-14 h-14 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-3 border-rose-500/20 border-t-rose-500 animate-spin" />
+                <Crown className="w-6 h-6 text-amber-500 animate-pulse" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Loading VIP Membership Plans...</h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Fetching latest plans and exclusive perks from server</p>
+              </div>
+            </div>
+          ) : plans.length === 0 ? (
+            <div className="py-16 flex flex-col items-center justify-center text-center space-y-3 rounded-3xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-dashed border-zinc-200 dark:border-zinc-800">
+              <AlertCircle className="w-8 h-8 text-amber-500" />
+              <p className="text-xs text-zinc-500">No subscription plans available right now.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLoadingPlans(true);
+                  membershipService.getPlansData().then(({ plans: fp }) => {
+                    if (Array.isArray(fp) && fp.length > 0) setPlans(fp);
+                  }).finally(() => setIsLoadingPlans(false));
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white hover:bg-rose-600 cursor-pointer shadow-xs"
+              >
+                Retry Loading
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -1508,7 +1540,7 @@ export default function UserSubscriptionsPage() {
                         <button
                           type="button"
                           onClick={() => handleSubscribe(plan)}
-                          disabled={isProcessing}
+                          disabled={isProcessing || isLoadingPlans}
                           className={`w-full py-3 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
                             isPopular
                               ? "bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:opacity-95 shadow-rose-500/25"

@@ -579,6 +579,194 @@
 }
 
 /* --------------------------------------------------------------------------
+   Plans Loading Spinner State
+   -------------------------------------------------------------------------- */
+.sub-plans-loading-wrapper {
+  width: 100%;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  background-color: var(--surface-hover);
+  border: 1.5px dashed var(--border-color);
+  border-radius: 2rem;
+  margin: 1rem 0 2rem 0;
+  animation: subFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sub-plans-spinner-container {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.sub-plans-spinner-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 3.5px solid rgba(225, 29, 72, 0.15);
+  border-top-color: #e11d48;
+  border-right-color: #ec4899;
+  animation: subSpin 0.85s linear infinite;
+}
+
+.sub-plans-spinner-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #f59e0b;
+  animation: subHeartPulse 1.8s ease-in-out infinite;
+  z-index: 2;
+}
+
+.sub-plans-spinner-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.22) 0%, rgba(245, 158, 11, 0.1) 50%, transparent 70%);
+  animation: subGlowPulse 2s ease-in-out infinite;
+}
+
+.sub-plans-loading-content {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.sub-plans-loading-heading {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.sub-plans-loading-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sub-plans-loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.sub-loading-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #e11d48;
+  animation: subDotBounce 1.4s ease-in-out infinite;
+}
+
+.sub-loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+  background-color: #ec4899;
+}
+
+.sub-loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+  background-color: #f59e0b;
+}
+
+.sub-plans-empty-wrapper {
+  width: 100%;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: var(--surface-hover);
+  border: 1.5px dashed var(--border-color);
+  border-radius: 2rem;
+  margin: 1rem 0 2rem 0;
+}
+
+.sub-retry-btn {
+  margin-top: 1.25rem;
+  padding: 0.625rem 1.75rem;
+  border-radius: 9999px;
+  background: var(--gradient-brand);
+  color: #ffffff;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.sub-retry-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+@keyframes subSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes subHeartPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes subGlowPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
+}
+
+@keyframes subDotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes subFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
    Individual Plan Pricing Card
    -------------------------------------------------------------------------- */
 .sub-card,
