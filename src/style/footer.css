@@ -1,0 +1,320 @@
+/* ==========================================================================
+   Prem Jodo - Component Style: Footer (src/style/footer.css)
+   Pure CSS without Tailwind or inline styles.
+   Hardware-accelerated animations, responsive layouts & dark mode support.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Main Footer Wrapper
+   -------------------------------------------------------------------------- */
+.site-footer {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  background-color: var(--footer-bg, #ffffff);
+  border-top: 1px solid var(--footer-border, #f4f4f5);
+  padding-top: 2.5rem; /* 40px */
+  padding-bottom: 7rem; /* 112px on mobile to clear bottom nav */
+  color: var(--text-primary, #18181b);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+:root.dark .site-footer,
+.dark .site-footer {
+  background-color: var(--footer-bg, #09090b);
+  border-top-color: var(--footer-border, #27272a);
+  color: #fafafa;
+}
+
+@media (min-width: 640px) {
+  .site-footer {
+    padding-top: 3rem;
+    padding-bottom: 5.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-footer {
+    padding-bottom: 3rem; /* 48px on desktop */
+  }
+}
+
+.footer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .footer-container {
+    padding: 0 1.5rem;
+    gap: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .footer-container {
+    padding: 0 3rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Footer Columns Grid
+   -------------------------------------------------------------------------- */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+/* Brand Column */
+.footer-col-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .footer-col-brand {
+    grid-column: span 4 / span 4;
+  }
+}
+
+.footer-tagline {
+  font-size: 0.75rem;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 400;
+  line-height: 1.625;
+  color: var(--footer-subtext, #71717a);
+  max-width: 22rem;
+}
+
+:root.dark .footer-tagline,
+.dark .footer-tagline {
+  color: var(--footer-subtext, #a1a1aa);
+}
+
+/* Links Columns */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .footer-col-platform {
+    grid-column: span 3 / span 3;
+  }
+  .footer-col-legal {
+    grid-column: span 3 / span 3;
+  }
+  .footer-col-support {
+    grid-column: span 2 / span 2;
+  }
+}
+
+.footer-heading {
+  font-size: 0.75rem;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #18181b);
+  margin-bottom: 0.25rem;
+}
+
+:root.dark .footer-heading,
+.dark .footer-heading {
+  color: #ffffff;
+}
+
+.footer-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-link {
+  font-size: 0.75rem;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 500;
+  color: var(--footer-subtext, #71717a);
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+  display: inline-block;
+  width: fit-content;
+}
+
+:root.dark .footer-link,
+.dark .footer-link {
+  color: var(--footer-subtext, #a1a1aa);
+}
+
+.footer-link:hover {
+  color: var(--footer-link-hover, #e11d48);
+  transform: translateX(2px);
+}
+
+:root.dark .footer-link:hover,
+.dark .footer-link:hover {
+  color: var(--footer-link-hover, #fb7185);
+}
+
+.footer-support-time {
+  font-size: 0.6875rem;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 400;
+  color: var(--text-muted, #a1a1aa);
+  padding-top: 0.25rem;
+}
+
+:root.dark .footer-support-time,
+.dark .footer-support-time {
+  color: var(--text-muted, #71717a);
+}
+
+/* --------------------------------------------------------------------------
+   Footer Bottom Bar & Legal Disclaimer
+   -------------------------------------------------------------------------- */
+.footer-bottom {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--footer-border, #f4f4f5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--footer-subtext, #71717a);
+}
+
+:root.dark .footer-bottom,
+.dark .footer-bottom {
+  border-top-color: var(--footer-border, #27272a);
+  color: var(--footer-subtext, #a1a1aa);
+}
+
+@media (min-width: 640px) {
+  .footer-bottom {
+    flex-direction: row;
+    margin-top: 1.5rem;
+  }
+}
+
+.footer-copyright {
+  font-family: var(--font-poppins), sans-serif;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .footer-copyright {
+    text-align: left;
+  }
+}
+
+.footer-bottom-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+}
+
+@media (min-width: 640px) {
+  .footer-bottom-actions {
+    gap: 1rem;
+  }
+}
+
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-bottom-link {
+  color: var(--footer-subtext, #71717a);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+:root.dark .footer-bottom-link,
+.dark .footer-bottom-link {
+  color: var(--footer-subtext, #a1a1aa);
+}
+
+.footer-bottom-link:hover {
+  color: var(--footer-link-hover, #e11d48);
+  text-decoration: underline;
+}
+
+:root.dark .footer-bottom-link:hover,
+.dark .footer-bottom-link:hover {
+  color: var(--footer-link-hover, #fb7185);
+}
+
+.footer-dot {
+  color: var(--text-muted, #a1a1aa);
+  opacity: 0.6;
+}
+
+/* Glass Language Selector Button */
+.footer-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 9999px;
+  background-color: var(--color-zinc-100, #f4f4f5);
+  border: 1px solid var(--border-subtle, rgba(228, 228, 231, 0.8));
+  color: var(--text-primary, #18181b);
+  font-size: 0.6875rem;
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+:root.dark .footer-lang-btn,
+.dark .footer-lang-btn {
+  background-color: var(--color-zinc-900, #18181b);
+  border-color: var(--border-color, #27272a);
+  color: #fafafa;
+}
+
+.footer-lang-btn:hover {
+  color: var(--color-primary-600, #e11d48);
+  border-color: var(--color-primary-300, #fda4af);
+  transform: translateY(-1px);
+}
+
+:root.dark .footer-lang-btn:hover,
+.dark .footer-lang-btn:hover {
+  color: var(--color-primary-400, #fb7185);
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+.footer-lang-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--color-primary-500, #f43f5e);
+}

@@ -1,0 +1,210 @@
+/* ==========================================================================
+   Prem Jodo - Global Base Styles & Design Tokens (public/css/global.css)
+   ========================================================================== */
+
+:root {
+  /* Core Theme Variables */
+  --background: #ffffff;
+  --foreground: #171717;
+  --surface: #ffffff;
+  --surface-hover: #f4f4f5;
+  --text-primary: #18181b;
+  --text-secondary: #71717a;
+  --text-muted: #a1a1aa;
+  --border-color: #f4f4f5;
+  --border-subtle: #e4e4e7;
+  color-scheme: light;
+
+  /* Font Family Stacks */
+  --font-poppins: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-slab: "Roboto Slab", Georgia, "Times New Roman", serif;
+  --font-sans: "Plus Jakarta Sans", var(--font-poppins), sans-serif;
+  --font-heading: "Outfit", var(--font-poppins), sans-serif;
+  --font-primary: var(--font-poppins);
+  --font-display: var(--font-slab);
+  --font-glass: var(--font-sans);
+
+  /* Primary Brand Colors (Rose Palette) */
+  --color-primary-50: #fff1f2;
+  --color-primary-100: #ffe4e6;
+  --color-primary-200: #fecdd3;
+  --color-primary-300: #fda4af;
+  --color-primary-400: #fb7185;
+  --color-primary-500: #f43f5e;
+  --color-primary-600: #e11d48;
+  --color-primary-700: #be123c;
+  --color-primary-800: #9f1239;
+  --color-primary-900: #881337;
+
+  /* Neutral Zinc Palette */
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+
+  /* Accent & Gradients */
+  --gradient-brand: linear-gradient(135deg, #e11d48 0%, #ec4899 50%, #f43f5e 100%);
+  --gradient-gold: linear-gradient(135deg, #f59e0b 0%, #eab308 50%, #f59e0b 100%);
+  --gradient-vip: linear-gradient(135deg, #fbbf24 0%, #fef08a 50%, #f59e0b 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+  --gradient-hero-text: linear-gradient(135deg, #e11d48 0%, #db2777 40%, #f59e0b 85%);
+  --gradient-hero-bg: linear-gradient(180deg, rgba(255, 241, 242, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+  --gradient-safety-bg: linear-gradient(180deg, rgba(255, 241, 242, 0.45) 0%, rgba(240, 249, 255, 0.35) 50%, rgba(255, 241, 242, 0.3) 100%);
+
+  /* Ambient Glow Aura Tokens */
+  --glow-color-1: rgba(244, 63, 94, 0.16);
+  --glow-color-2: rgba(236, 72, 153, 0.12);
+  --glow-color-3: rgba(245, 158, 11, 0.10);
+
+  /* Button & Card Elevation Shadows */
+  --btn-primary-shadow: 0 14px 30px -8px rgba(225, 29, 72, 0.38);
+  --btn-primary-hover-shadow: 0 20px 38px -6px rgba(225, 29, 72, 0.52);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --card-hover-shadow: 0 22px 42px -10px rgba(225, 29, 72, 0.16), 0 10px 20px -8px rgba(0, 0, 0, 0.06);
+
+  /* Header & Navbar Glass Variables */
+  --header-bg: rgba(255, 255, 255, 0.82);
+  --header-border: rgba(244, 244, 245, 0.9);
+  --header-blur: 16px;
+  --header-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+
+  /* Footer Glass & Background Variables */
+  --footer-bg: #ffffff;
+  --footer-border: #f4f4f5;
+  --footer-subtext: #71717a;
+  --footer-link-hover: #e11d48;
+
+  /* Glassmorphism Token Variables */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-border-subtle: rgba(0, 0, 0, 0.06);
+  --glass-blur: 16px;
+  --glass-shadow: 0 8px 32px 0 rgba(225, 29, 72, 0.08);
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --surface: #121216;
+  --surface-hover: #1f1f23;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-color: #27272a;
+  --border-subtle: #18181b;
+  color-scheme: dark;
+
+  /* Gradients - Dark Mode */
+  --gradient-hero-bg: linear-gradient(180deg, rgba(24, 24, 27, 0.4) 0%, rgba(9, 9, 11, 0) 100%);
+  --gradient-safety-bg: linear-gradient(180deg, #09090b 0%, rgba(24, 24, 27, 0.65) 50%, #09090b 100%);
+
+  /* Ambient Glow Aura Tokens - Dark Mode */
+  --glow-color-1: rgba(244, 63, 94, 0.24);
+  --glow-color-2: rgba(236, 72, 153, 0.18);
+  --glow-color-3: rgba(245, 158, 11, 0.14);
+
+  /* Button & Card Elevation Shadows - Dark Mode */
+  --btn-primary-shadow: 0 14px 32px -6px rgba(244, 63, 94, 0.45);
+  --btn-primary-hover-shadow: 0 20px 42px -4px rgba(244, 63, 94, 0.6);
+  --card-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+  --card-hover-shadow: 0 22px 45px -8px rgba(244, 63, 94, 0.25), 0 10px 24px -6px rgba(0, 0, 0, 0.4);
+
+  /* Header & Navbar Glass Variables - Dark Mode */
+  --header-bg: rgba(9, 9, 11, 0.82);
+  --header-border: rgba(39, 39, 42, 0.8);
+  --header-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
+
+  /* Footer Glass & Background Variables - Dark Mode */
+  --footer-bg: #09090b;
+  --footer-border: #27272a;
+  --footer-subtext: #a1a1aa;
+  --footer-link-hover: #fb7185;
+
+  /* Glassmorphism Token Variables - Dark Mode */
+  --glass-bg: rgba(18, 18, 22, 0.85);
+  --glass-bg-subtle: rgba(18, 18, 22, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-subtle: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   HTML & Body Resets
+   ========================================================================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-poppins);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   Global 1200px Max-Width Container
+   ========================================================================== */
+.container,
+.app-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container,
+  .app-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container,
+  .app-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* ==========================================================================
+   Interactive & Form Element Resets
+   ========================================================================== */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

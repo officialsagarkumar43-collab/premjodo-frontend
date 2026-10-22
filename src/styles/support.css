@@ -1,0 +1,362 @@
+/* ==========================================================================
+   Prem Jodo - Support & FAQ Page Dedicated External Stylesheet
+   File: src/styles/support.css
+   Pure CSS without Tailwind or inline styles.
+   Hardware-accelerated animations, responsive layouts & global tokens.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Layout & Wrapper
+   -------------------------------------------------------------------------- */
+.support-page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+.support-page-main {
+  flex: 1 1 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Hero Section
+   -------------------------------------------------------------------------- */
+.support-hero-section {
+  position: relative;
+  padding: 2.25rem 1rem 2rem 1rem;
+  text-align: center;
+  overflow: hidden;
+  background: var(--gradient-hero-bg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 640px) {
+  .support-hero-section {
+    padding: 2.75rem 1.5rem 2.25rem 1.5rem;
+  }
+}
+
+.support-hero-inner {
+  max-width: 54rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.support-hero-title {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 900;
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .support-hero-title {
+    font-size: 3.5rem;
+  }
+}
+
+.support-title-gradient {
+  background: var(--gradient-hero-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  margin-left: 0.35rem;
+}
+
+.support-hero-subtitle {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+@media (min-width: 640px) {
+  .support-hero-subtitle {
+    font-size: 1.125rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   FAQ and Contact Grid
+   -------------------------------------------------------------------------- */
+.support-content-section {
+  padding: 1.75rem 1rem 4rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .support-content-section {
+    padding: 2rem 1.5rem 5rem 1.5rem;
+  }
+}
+
+.support-grid-wrap {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .support-grid-wrap {
+    grid-template-columns: 7fr 5fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   FAQ Accordion Column
+   -------------------------------------------------------------------------- */
+.support-faq-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.support-section-heading {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 900;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.support-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.support-faq-item {
+  border-radius: 1rem;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.support-faq-item.is-open {
+  border-color: rgba(244, 63, 94, 0.45);
+  box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.08);
+}
+
+.support-faq-trigger {
+  width: 100%;
+  padding: 1.25rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.support-faq-question {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: color 0.2s ease;
+}
+
+.support-faq-item.is-open .support-faq-question {
+  color: var(--color-primary-600);
+}
+
+.dark .support-faq-item.is-open .support-faq-question {
+  color: var(--color-primary-400);
+}
+
+.support-faq-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-hover);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.support-faq-item.is-open .support-faq-icon-btn {
+  background-color: var(--color-primary-600);
+  color: #ffffff;
+  transform: rotate(180deg);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+}
+
+.support-faq-body-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.support-faq-item.is-open .support-faq-body-collapse {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.support-faq-inner-body {
+  overflow: hidden;
+}
+
+.support-faq-body-content {
+  padding: 0 1.25rem 1.25rem 1.25rem;
+}
+
+.support-faq-body-divider {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.support-faq-answer {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Direct Contact Form Card (Sticky Sidebar)
+   -------------------------------------------------------------------------- */
+.support-form-sticky-wrap {
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .support-form-sticky-wrap {
+    position: sticky;
+    top: 6.5rem;
+  }
+}
+
+.support-form-card {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.support-form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.support-form-title {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 900;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.support-form-subtitle {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.support-success-box {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.support-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.support-input-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.support-input-text {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.775rem;
+  background-color: var(--background);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-input-text:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+}
+
+.support-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.775rem;
+  background-color: var(--background);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+}
+
+.support-submit-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--gradient-brand);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--btn-primary-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.support-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--btn-primary-hover-shadow);
+  opacity: 0.95;
+}
+
+.support-submit-btn:active {
+  transform: scale(0.97);
+}

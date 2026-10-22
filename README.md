@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prem Jode Frontend - Dating & Connection Platform ❤️
 
-## Getting Started
+A modern, high-performance dating platform built with **Next.js 16 (App Router)**, **JavaScript**, **Tailwind CSS 4**, and **Google Fonts**.
 
-First, run the development server:
+## 🌟 Key Features
 
+- **Multi-Language Support (6 Languages)**:
+  - English, हिन्दी (Hindi), ਪੰਜਾਬੀ (Punjabi), भोजपुरी (Bhojpuri), मैथिली (Maithili), తెలుగు (Telugu)
+- **Tinder-Style Authentication Flow (`AuthModal.jsx`)**:
+  - 3-step authentication (Get Started -> What's your email -> 6-digit OTP code verification)
+- **Interactive User Portal (`/user`)**:
+  - Card discovery swipe deck (Like, Pass, Superlike), Recent Matches list, User Profile & Preferences
+- **Executive Dating Admin Portal (`/admin`)**:
+  - Live swipers & match conversion analytics, Selfie photo verification queue, Catfish moderation
+- **Modern Typography Design**:
+  - `Roboto Slab` for iconic hero branding (*"It starts with a swipe.™"*)
+  - `Poppins` with utility classes (`poppins-bold`, `poppins-semibold`, `poppins-black`)
+  - `Plus Jakarta Sans` for clean, readable body & chat UI
+
+---
+
+## 🛠️ Build & Development Commands
+
+### 1. Run Development Server
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Create Production Build
+```bash
+npm run build
+```
+*(Or double-click `build.bat` on Windows)*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Start Production Server
+```bash
+npm run start
+```
+Launches the optimized production server on [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📁 Project Architecture
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/
+│   ├── page.jsx                    # Root Dating Landing Page
+│   ├── layout.jsx                  # Root Layout with Fonts & LanguageProvider
+│   ├── globals.css                 # Global styles, typography & font classes
+│   │
+│   ├── user/                       # User Portal
+│   │   ├── layout.jsx              # User Nav Layout
+│   │   ├── page.jsx                # Swipe Deck & Feed (/user)
+│   │   ├── matches/page.jsx        # Matches & Chat (/user/matches)
+│   │   └── profile/page.jsx        # Dating Profile (/user/profile)
+│   │
+│   └── admin/                      # Admin Command Center
+│       ├── layout.jsx              # Admin Sidebar Layout
+│       ├── page.jsx                # Dating Dashboard Overview (/admin)
+│       ├── users/page.jsx          # Daters & Profile Management (/admin/users)
+│       └── analytics/page.jsx      # Swiping & Match Conversion Analytics (/admin/analytics)
+│
+├── components/
+│   ├── common/                     # Shared UI (Navbar, Footer, Button, Logo, AuthModal, LanguageModal)
+│   ├── user/                       # User UI (SwipeCard, MatchesList, UserNav)
+│   └── admin/                      # Admin UI (AdminSidebar, AdminHeader, StatsOverview, UserManagementTable)
+│
+├── context/
+│   └── LanguageContext.jsx         # Multi-language Provider & Hook
+│
+└── lib/
+    ├── common/                     # Utility helpers & translations
+    ├── user/                       # Dating profiles mock data
+    └── admin/                      # Dating admin metrics mock data
+```

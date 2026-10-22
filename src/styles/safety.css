@@ -1,0 +1,288 @@
+/* ==========================================================================
+   Prem Jodo - Safety Page Dedicated External Stylesheet
+   File: src/styles/safety.css
+   Pure CSS without Tailwind or inline styles.
+   Hardware-accelerated animations, responsive layouts & global tokens.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Layout & Wrapper
+   -------------------------------------------------------------------------- */
+.safety-page-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
+.safety-page-main {
+  flex: 1 1 auto;
+}
+
+/* --------------------------------------------------------------------------
+   Hero Section
+   -------------------------------------------------------------------------- */
+.safety-hero-section {
+  position: relative;
+  padding: 2.25rem 1rem 2rem 1rem;
+  text-align: center;
+  overflow: hidden;
+  background: var(--gradient-hero-bg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 640px) {
+  .safety-hero-section {
+    padding: 2.75rem 1.5rem 2.25rem 1.5rem;
+  }
+}
+
+.safety-hero-inner {
+  max-width: 54rem;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.safety-hero-title {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 900;
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .safety-hero-title {
+    font-size: 3.5rem;
+  }
+}
+
+.safety-title-gradient {
+  background: var(--gradient-hero-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  margin-left: 0.35rem;
+}
+
+.safety-hero-subtitle {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 42rem;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+@media (min-width: 640px) {
+  .safety-hero-subtitle {
+    font-size: 1.125rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4 Pillars of Safety Section
+   -------------------------------------------------------------------------- */
+.safety-pillars-section {
+  padding: 1.75rem 1rem 4rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .safety-pillars-section {
+    padding: 2rem 1.5rem 5rem 1.5rem;
+  }
+}
+
+.safety-pillars-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.safety-section-heading {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 900;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .safety-section-heading {
+    font-size: 2.25rem;
+  }
+}
+
+.safety-pillars-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .safety-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.safety-pillar-card {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s ease,
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.safety-pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--color-primary-300);
+}
+
+.dark .safety-pillar-card:hover {
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+.safety-pillar-icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
+  border: 1px solid var(--color-primary-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.dark .safety-pillar-icon-box {
+  background-color: rgba(244, 63, 94, 0.12);
+  color: var(--color-primary-400);
+  border-color: rgba(244, 63, 94, 0.25);
+}
+
+.safety-pillar-card:hover .safety-pillar-icon-box {
+  transform: scale(1.08) rotate(3deg);
+}
+
+.safety-pillar-content {
+  flex: 1 1 auto;
+}
+
+.safety-pillar-title {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.safety-pillar-desc {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Real-World Meetup Safety Rules Section
+   -------------------------------------------------------------------------- */
+.safety-rules-section {
+  padding: 4rem 1rem;
+  background-color: var(--surface-hover);
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 640px) {
+  .safety-rules-section {
+    padding: 5rem 1.5rem;
+  }
+}
+
+.safety-rules-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.safety-rules-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.safety-rules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .safety-rules-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.safety-rule-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.safety-rule-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow);
+}
+
+.safety-rule-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.safety-rule-title-box.color-rose {
+  color: var(--color-primary-500);
+}
+
+.safety-rule-title-box.color-amber {
+  color: #f59e0b;
+}
+
+.safety-rule-title-box.color-purple {
+  color: #a855f7;
+}
+
+.safety-rule-desc {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}

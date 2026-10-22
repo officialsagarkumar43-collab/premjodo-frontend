@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="pjGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="50%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded Gradient Background -->
+  <rect width="64" height="64" rx="18" fill="url(#pjGrad)"/>
+  
+  <!-- Connected Heart Handshake Icon -->
+  <g transform="translate(8, 8)" fill="rgba(255,255,255,0.2)" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 28c3-3 6-6.5 6-11A11 11 0 0 0 33 6c-3.5 0-6 1-9 4-3-3-5.5-4-9-4A11 11 0 0 0 4 17c0 4.5 3 8 6 11l14 14Z"/>
+    <path d="M24 10 L18 16 a4 4 0 0 0 0 6 c1.6 1.6 4.2 1.6 6 0 l4 -4 a5.6 5.6 0 0 1 7.6 0 l6 5.3" fill="none"/>
+    <path d="m36 30 -4-4" fill="none"/>
+    <path d="m30 36 -4-4" fill="none"/>
+  </g>
+  
+  <!-- Golden Sparkle Dot -->
+  <circle cx="52" cy="12" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+</svg>
