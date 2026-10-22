@@ -103,7 +103,6 @@ export default function PremJodoLandingPage() {
                 <span key={wordIndex} className="hero-word-animated">
                   {ROTATING_WORDS[wordIndex]}
                 </span>
-                <span className="hero-trademark-symbol">™</span>
               </span>
             </h1>
 
