@@ -169,6 +169,11 @@ export default function RootLayout({ children }) {
       className={`${poppins.variable} ${robotoSlab.variable} ${plusJakarta.variable} ${outfit.variable} antialiased`}
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("prem_jodo_theme");var d=window.matchMedia("(prefers-color-scheme: dark)").matches;if(t==="dark"||(!t&&d)){document.documentElement.classList.add("dark");document.documentElement.setAttribute("data-theme","dark");document.documentElement.style.colorScheme="dark";}}catch(e){}})();`,
+          }}
+        />
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" type="image/png" sizes="48x48" href="/icon-48x48.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/icon-96x96.png" />

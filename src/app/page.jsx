@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,27 +10,12 @@ import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { useIntersectionObserver } from "@/lib/hooks/useIntersectionObserver";
-import { SafetyApproachSkeleton } from "@/components/reusable";
+import { Preloader, SafetyApproach } from "@/components/reusable";
 import "@/styles/home.css";
 
-// 1. Code-splitting: Defer heavy AuthModal chunk until opened by user action
+// Code-splitting: Defer heavy AuthModal chunk until opened by user action
 const AuthModal = dynamic(
   () => import("@/components/common/AuthModal").then((m) => m.AuthModal),
-  { ssr: false }
-);
-
-// 2. Code-splitting: Defer below-the-fold Trust & Safety component with zero-CLS skeleton
-const SafetyApproach = dynamic(
-  () => import("@/components/reusable/SafetyApproach").then((m) => m.SafetyApproach),
-  {
-    ssr: true,
-    loading: () => <SafetyApproachSkeleton />,
-  }
-);
-
-// 3. Code-splitting: Preloader overlay
-const Preloader = dynamic(
-  () => import("@/components/reusable/Preloader").then((m) => m.Preloader),
   { ssr: false }
 );
 
@@ -39,11 +24,13 @@ const ROTATING_WORDS = ["swipe.", "match.", "spark.", "connect."];
 export default function PremJodoLandingPage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { isAuthenticated, refreshSubscription } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const { isAuthenticated, isLoading: authLoading, refreshSubscription } = useAuth();
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("register");
   const [wordIndex, setWordIndex] = useState(0);
+  const refreshedRef = useRef(false);
 
   // Intersection Observer for Hero quote and call-to-action
   const [quoteRef, isQuoteVisible] = useIntersectionObserver({
@@ -60,16 +47,50 @@ export default function PremJodoLandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Smooth preloader transition on mount & refresh active subscription
+  // Refresh active subscription when authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !refreshedRef.current) {
+      refreshedRef.current = true;
       refreshSubscription();
     }
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 250);
-    return () => clearTimeout(timer);
   }, [isAuthenticated, refreshSubscription]);
+
+  // Smooth, flicker-free preloader lifecycle:
+  // Renders immediately with initial SSR HTML, waits for auth readiness (or min display time),
+  // then performs a silky 450ms fade-out transition before unmounting.
+  useEffect(() => {
+    let unmountTimer;
+
+    const startExit = () => {
+      setIsExiting(true);
+      unmountTimer = setTimeout(() => {
+        setShowPreloader(false);
+      }, 450);
+    };
+
+    const minDisplayMs = 500;
+    const maxFallbackMs = 900;
+    const startTime = Date.now();
+
+    let readyTimer = null;
+
+    if (!authLoading) {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, minDisplayMs - elapsed);
+      readyTimer = setTimeout(startExit, remaining);
+    }
+
+    // Safety fallback so page always appears even if auth network request stalls
+    const fallbackTimer = setTimeout(() => {
+      startExit();
+    }, maxFallbackMs);
+
+    return () => {
+      if (readyTimer) clearTimeout(readyTimer);
+      clearTimeout(fallbackTimer);
+      if (unmountTimer) clearTimeout(unmountTimer);
+    };
+  }, [authLoading]);
 
   const openAuth = (mode = "register") => {
     if (isAuthenticated) {
@@ -82,8 +103,8 @@ export default function PremJodoLandingPage() {
 
   return (
     <div className="landing-page-root">
-      {/* Code-split Preloader */}
-      {isLoading && <Preloader fullScreen={true} />}
+      {/* Full-screen initial preloader with silky fade-out exit */}
+      {showPreloader && <Preloader fullScreen={true} isExiting={isExiting} />}
 
       <Navbar onOpenAuth={openAuth} />
 
@@ -108,7 +129,10 @@ export default function PremJodoLandingPage() {
 
             {/* Interactive CTA Buttons Group */}
             <div className="hero-cta-group">
-              {isAuthenticated ? (
+              {authLoading ? (
+                // Smooth placeholder during initial auth sync behind preloader
+                <div style={{ minHeight: "48px" }} aria-hidden="true" />
+              ) : isAuthenticated ? (
                 <>
                   <Link
                     href="/user"
@@ -163,7 +187,7 @@ export default function PremJodoLandingPage() {
           </div>
         </section>
 
-        {/* Dedicated Trust & Safety Section (Code-Split & Intersection Observer animated) */}
+        {/* Dedicated Trust & Safety Section */}
         <SafetyApproach />
       </main>
 

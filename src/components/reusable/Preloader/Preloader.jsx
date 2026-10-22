@@ -9,6 +9,7 @@ export function Preloader({
   text = null,
   showBrand = true,
   className = "",
+  isExiting = false,
 }) {
   const content = (
     <div className={`${styles.loaderContent} ${className}`}>
@@ -43,7 +44,7 @@ export function Preloader({
   if (fullScreen) {
     return (
       <div
-        className={styles.preloaderOverlay}
+        className={`${styles.preloaderOverlay} ${isExiting ? styles.isExiting : ""}`}
         role="status"
         aria-live="polite"
         aria-label="Loading"
@@ -55,7 +56,7 @@ export function Preloader({
 
   return (
     <div
-      className={styles.inlineContainer}
+      className={`${styles.inlineContainer} ${isExiting ? styles.isExiting : ""}`}
       role="status"
       aria-live="polite"
       aria-label="Loading"
