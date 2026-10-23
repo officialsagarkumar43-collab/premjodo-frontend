@@ -169,6 +169,10 @@ function DiscoveryContent() {
 
         setProfiles(loadedProfiles);
 
+        if (!Array.isArray(loadedProfiles) || loadedProfiles.length === 0) {
+          hasLoadedDataRef.current = false;
+        }
+
         const storedUser = typeof window !== "undefined" ? authService.getUser() : null;
         const storedProfile = typeof window !== "undefined" ? authService.getProfile() : null;
 
@@ -589,6 +593,9 @@ function DiscoveryContent() {
       const targetId = profile._id || profile.id;
       if (targetId) {
         const res = await matchService.swipeUser(targetId, action);
+        if (res?.limitReached) {
+          return;
+        }
         if (res?.isMutualMatch) {
           setMutualMatchPopup({
             partnerName: profile.name,

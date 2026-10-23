@@ -212,72 +212,100 @@ export function handleUnauthorizedResponse(endpoint = "") {
 export async function apiFetch(endpoint, options = {}) {
   const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
 
-  const token = getAccessToken();
+  const method = (options.method || "GET").toUpperCase();
+  const maxRetries = options.retries !== undefined ? options.retries : (method === "GET" ? 2 : 0);
+  let attempt = 0;
 
-  let requestHeaders = {};
-  if (options.headers instanceof Headers) {
-    options.headers.forEach((val, key) => {
-      requestHeaders[key] = val;
-    });
-  } else if (options.headers && typeof options.headers === "object") {
-    requestHeaders = { ...options.headers };
-  }
+  const getFetchOptions = () => {
+    const token = getAccessToken();
 
-  if (!requestHeaders["Content-Type"] && !requestHeaders["content-type"] && !(options.body instanceof FormData)) {
-    requestHeaders["Content-Type"] = "application/json";
-  }
+    let requestHeaders = {};
+    if (options.headers instanceof Headers) {
+      options.headers.forEach((val, key) => {
+        requestHeaders[key] = val;
+      });
+    } else if (options.headers && typeof options.headers === "object") {
+      requestHeaders = { ...options.headers };
+    }
 
-  if (token) {
-    const cleanToken = String(token).trim().replace(/^Bearer\s+/i, "");
-    requestHeaders["Authorization"] = `Bearer ${cleanToken}`;
-  }
+    if (!requestHeaders["Content-Type"] && !requestHeaders["content-type"] && !(options.body instanceof FormData)) {
+      requestHeaders["Content-Type"] = "application/json";
+    }
 
-  const fetchOptions = {
-    ...options,
-    headers: requestHeaders,
-    credentials: "include", // sends cookies alongside bearer header
+    if (token) {
+      const cleanToken = String(token).trim().replace(/^Bearer\s+/i, "");
+      requestHeaders["Authorization"] = `Bearer ${cleanToken}`;
+    }
+
+    return {
+      ...options,
+      headers: requestHeaders,
+      credentials: "include", // sends cookies alongside bearer header
+    };
   };
 
-  try {
-    const response = await fetch(url, fetchOptions);
+  while (attempt <= maxRetries) {
+    const fetchOptions = getFetchOptions();
 
-    // Global 401 Unauthorized Interceptor Middleware for protected APIs
-    if (response.status === 401) {
-      handleUnauthorizedResponse(endpoint);
-    }
+    try {
+      const response = await fetch(url, fetchOptions);
 
-    return response;
-  } catch (error) {
-    // Attempt automatic fallback between localhost and 127.0.0.1 if network resolution failed
-    if (url.includes("localhost") && error instanceof TypeError && error.message === "Failed to fetch") {
-      try {
-        const fallbackUrl = url.replace("localhost", "127.0.0.1");
-        const fbResponse = await fetch(fallbackUrl, fetchOptions);
-        if (fbResponse.status === 401) {
-          handleUnauthorizedResponse(endpoint);
-        }
-        return fbResponse;
-      } catch { }
-    } else if (url.includes("127.0.0.1") && error instanceof TypeError && error.message === "Failed to fetch") {
-      try {
-        const fallbackUrl = url.replace("127.0.0.1", "localhost");
-        const fbResponse = await fetch(fallbackUrl, fetchOptions);
-        if (fbResponse.status === 401) {
-          handleUnauthorizedResponse(endpoint);
-        }
-        return fbResponse;
-      } catch { }
-    }
+      // Global 401 Unauthorized Interceptor Middleware for protected APIs
+      if (response.status === 401) {
+        handleUnauthorizedResponse(endpoint);
+        return response;
+      }
 
-    if (typeof window !== "undefined") {
-      console.warn(`[apiClient] Network request failed for ${url}. Is backend running on ${API_BASE_URL}?`, error?.message || error);
+      // Retry on transient gateway errors (502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout)
+      // which commonly happen on Render.com cold starts
+      const isTransientServerError = [502, 503, 504].includes(response.status);
+      if (isTransientServerError && attempt < maxRetries) {
+        attempt++;
+        const backoffMs = 1000 * attempt;
+        await new Promise((res) => setTimeout(res, backoffMs));
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      // Attempt automatic fallback between localhost and 127.0.0.1 if network resolution failed
+      if (url.includes("localhost") && error instanceof TypeError && error.message === "Failed to fetch") {
+        try {
+          const fallbackUrl = url.replace("localhost", "127.0.0.1");
+          const fbResponse = await fetch(fallbackUrl, fetchOptions);
+          if (fbResponse.status === 401) {
+            handleUnauthorizedResponse(endpoint);
+          }
+          return fbResponse;
+        } catch { }
+      } else if (url.includes("127.0.0.1") && error instanceof TypeError && error.message === "Failed to fetch") {
+        try {
+          const fallbackUrl = url.replace("127.0.0.1", "localhost");
+          const fbResponse = await fetch(fallbackUrl, fetchOptions);
+          if (fbResponse.status === 401) {
+            handleUnauthorizedResponse(endpoint);
+          }
+          return fbResponse;
+        } catch { }
+      }
+
+      if (attempt < maxRetries) {
+        attempt++;
+        const backoffMs = 1200 * attempt;
+        await new Promise((res) => setTimeout(res, backoffMs));
+        continue;
+      }
+
+      if (typeof window !== "undefined") {
+        console.warn(`[apiClient] Network request failed for ${url}. Is backend running on ${API_BASE_URL}?`, error?.message || error);
+      }
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        const friendlyError = new Error(`Cannot connect to server at ${API_BASE_URL}. Please check internet connection or backend server status.`);
+        friendlyError.cause = error;
+        throw friendlyError;
+      }
+      throw error;
     }
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      const friendlyError = new Error(`Cannot connect to server at ${API_BASE_URL}. Please ensure the backend server is running and CORS / CORP allows http://localhost:3000.`);
-      friendlyError.cause = error;
-      throw friendlyError;
-    }
-    throw error;
   }
 }
 

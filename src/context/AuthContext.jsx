@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import authService from "@/lib/services/auth.service";
 import membershipService from "@/lib/services/membership.service";
+import socketService from "@/lib/services/socket.service";
 
 const AuthContext = createContext({
   user: null,
@@ -61,21 +62,25 @@ export function AuthProvider({ children }) {
       if (isAuth) {
         // Concurrently fetch /auth/me and /membership/my-subscription upfront on page load
         const promises = [];
+        const hasFullProfile = Boolean(
+          currentProfile &&
+          (currentProfile.bio || currentProfile.photos?.length || currentProfile.birthday || currentProfile.interests?.length)
+        );
 
-        if (force || fetchedMeUserRef.current !== currentUserId) {
-          fetchedMeUserRef.current = currentUserId;
+        if (force || fetchedMeUserRef.current !== currentUserId || !hasFullProfile) {
           promises.push(
             authService
               .getCurrentUser(force)
               .then((meData) => {
                 if (meData) {
+                  fetchedMeUserRef.current = currentUserId;
                   const resolvedUser =
                     meData.user ||
                     (meData.email || meData._id ? meData : null) ||
                     authService.getUser();
                   const resolvedProfile =
                     meData.profile ||
-                    (meData.photos || meData.bio || meData.birthday || meData.gender || meData.lookingFor ? meData : null) ||
+                    (meData.photos || meData.bio || meData.birthday || meData.gender || meData.lookingFor || meData.interests ? meData : null) ||
                     authService.getProfile();
 
                   if (resolvedUser) setUser(resolvedUser);
@@ -95,23 +100,32 @@ export function AuthProvider({ children }) {
                       }
                     } catch {}
                   }
+                } else {
+                  // If fetch failed, allow subsequent syncAuth calls to retry
+                  fetchedMeUserRef.current = null;
                 }
               })
-              .catch(() => {})
+              .catch(() => {
+                fetchedMeUserRef.current = null;
+              })
           );
         }
 
         if (force || fetchedSubUserRef.current !== currentUserId) {
-          fetchedSubUserRef.current = currentUserId;
           promises.push(
             membershipService
               .getMySubscription()
               .then((subData) => {
                 if (subData) {
+                  fetchedSubUserRef.current = currentUserId;
                   setSubscription(subData);
+                } else {
+                  fetchedSubUserRef.current = null;
                 }
               })
-              .catch(() => {})
+              .catch(() => {
+                fetchedSubUserRef.current = null;
+              })
           );
         }
 
@@ -138,15 +152,76 @@ export function AuthProvider({ children }) {
       const p = authService.getProfile();
       if (u) setUser(u);
       if (p) setProfile(p);
-      syncAuth(false);
+    };
+
+    const handleFocus = () => {
+      if (authService.isAuthenticated()) {
+        const p = authService.getProfile();
+        if (!p || (!p.bio && !p.photos?.length)) {
+          syncAuth(true);
+        }
+      }
+    };
+
+    // Real-time listener for socket membership/subscription quota updates
+    const unsubMembership = socketService.onMembershipUpdated((data) => {
+      if (data?.subscription) {
+        setSubscription((prev) => ({
+          ...(prev || {}),
+          ...(data.subscription || {}),
+          swipesUsedToday:
+            data.swipesUsedToday ??
+            data.subscription?.swipesUsedToday ??
+            prev?.swipesUsedToday,
+          swipesRemainingToday:
+            data.swipesRemainingToday ??
+            prev?.swipesRemainingToday,
+          dailySwipeLimit:
+            data.dailySwipeLimit ??
+            data.subscription?.perks?.dailySwipeLimit ??
+            prev?.dailySwipeLimit ??
+            50,
+        }));
+      }
+    });
+
+    const handleSwipesUpdated = (e) => {
+      const detail = e?.detail;
+      if (detail) {
+        setSubscription((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            swipesUsedToday:
+              detail.swipesUsedToday ?? prev.swipesUsedToday,
+            swipesRemainingToday:
+              detail.swipesRemainingToday ?? prev.swipesRemainingToday,
+            dailySwipeLimit:
+              detail.dailySwipeLimit ?? prev.dailySwipeLimit ?? 50,
+          };
+        });
+      }
     };
 
     window.addEventListener("storage", handleAuthChange);
     window.addEventListener("pj-auth-changed", handleAuthChange);
+    window.addEventListener("pj-swipes-updated", handleSwipesUpdated);
+    window.addEventListener("focus", handleFocus);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        handleFocus();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
+      if (unsubMembership) unsubMembership();
       window.removeEventListener("storage", handleAuthChange);
       window.removeEventListener("pj-auth-changed", handleAuthChange);
+      window.removeEventListener("pj-swipes-updated", handleSwipesUpdated);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [syncAuth]);
 

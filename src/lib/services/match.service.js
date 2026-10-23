@@ -47,6 +47,35 @@ export const matchService = {
       const data = await response.json().catch(() => ({}));
       matchService.invalidateWhoLikedCache();
 
+      // Check if backend returned HTTP 429 (Too Many Requests / Daily Swipe Limit Reached)
+      if (
+        response.status === 429 ||
+        data?.statusCode === 429 ||
+        (typeof data?.message === "string" && data.message.toLowerCase().includes("daily swipe limit"))
+      ) {
+        const limitMsg =
+          data?.message ||
+          "Daily swipe limit reached. Upgrade your plan for unlimited swipes or check back tomorrow!";
+        const errorResult = {
+          success: false,
+          limitReached: true,
+          statusCode: 429,
+          message: limitMsg,
+          dailySwipeLimit: data?.data?.dailySwipeLimit ?? data?.dailySwipeLimit ?? 50,
+          swipesUsedToday: data?.data?.swipesUsedToday ?? data?.swipesUsedToday,
+          swipesRemainingToday: 0,
+        };
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("pj-swipe-limit-reached", {
+              detail: errorResult,
+            })
+          );
+        }
+        return errorResult;
+      }
+
       if (!response.ok || data?.success === false) {
         console.warn("Backend swipe API note:", data?.message || response.status);
         return {
@@ -56,7 +85,24 @@ export const matchService = {
         };
       }
 
-      return data?.data || data;
+      const resultData = data?.data || data;
+
+      // Broadcast updated swipe balance to active UI listeners (e.g. counter pills, headers)
+      if (typeof window !== "undefined" && resultData) {
+        window.dispatchEvent(
+          new CustomEvent("pj-swipes-updated", {
+            detail: {
+              swipesUsedToday: resultData.swipesUsedToday,
+              swipesRemainingToday: resultData.swipesRemainingToday,
+              dailySwipeLimit: resultData.dailySwipeLimit,
+              unlimitedSwipes: resultData.unlimitedSwipes,
+              superLikesRemaining: resultData.superLikesRemaining,
+            },
+          })
+        );
+      }
+
+      return resultData;
     } catch (error) {
       console.warn("swipeUser network note:", error.message);
       return {
@@ -277,7 +323,24 @@ export const matchService = {
       });
       const data = await response.json().catch(() => ({}));
       matchService.invalidateWhoLikedCache();
-      return data?.data || data;
+      const resData = data?.data || data;
+
+      // Broadcast restored swipe to live UI counter
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("pj-swipes-updated", {
+            detail: {
+              isRewound: true,
+              targetUserId,
+              swipesUsedToday: resData?.swipesUsedToday,
+              swipesRemainingToday: resData?.swipesRemainingToday,
+              dailySwipeLimit: resData?.dailySwipeLimit,
+            },
+          })
+        );
+      }
+
+      return resData;
     } catch (err) {
       console.warn("rewindSwipe note:", err?.message || err);
       return null;

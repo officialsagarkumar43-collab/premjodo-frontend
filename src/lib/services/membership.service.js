@@ -163,6 +163,18 @@ export const membershipService = {
                 sub?.refundEligibility ||
                 json?.refundEligibility ||
                 null,
+              swipesRemainingToday:
+                json?.data?.swipesRemainingToday ??
+                sub?.swipesRemainingToday ??
+                null,
+              dailySwipeLimit:
+                json?.data?.dailySwipeLimit ??
+                sub?.perks?.dailySwipeLimit ??
+                50,
+              swipesUsedToday:
+                json?.data?.swipesUsedToday ??
+                sub?.swipesUsedToday ??
+                0,
             };
           }
         }
@@ -175,6 +187,24 @@ export const membershipService = {
     })();
 
     return mySubscriptionPromise;
+  },
+
+  /**
+   * Fetch complete membership details including daily swipe limit and remaining balance
+   * GET /membership/details
+   * @returns {Promise<Object|null>}
+   */
+  async getMembershipDetails() {
+    try {
+      const res = await apiFetch("/membership/details", { method: "GET" });
+      if (res && res.ok) {
+        const json = await res.json().catch(() => ({}));
+        return json?.data || json;
+      }
+    } catch (err) {
+      console.warn("[membershipService] getMembershipDetails error:", err);
+    }
+    return null;
   },
 
   /**

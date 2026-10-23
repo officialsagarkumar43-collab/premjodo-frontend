@@ -44,10 +44,19 @@ export default function EditPhotosPage() {
   const fileInputRefs = useRef([]);
 
   useEffect(() => {
-    function loadPhotos() {
+    let isMounted = true;
+    async function loadPhotos() {
       try {
-        const activeProfile = authService.getProfile() || profile;
-        const activeUser = authService.getUser() || user;
+        let activeProfile = authService.getProfile() || profile;
+        let activeUser = authService.getUser() || user;
+
+        if (!activeProfile || (!activeProfile.photos?.length && !activeUser?.photos?.length)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) activeProfile = meData.profile;
+          if (meData?.user) activeUser = meData.user;
+        }
+
+        if (!isMounted) return;
 
         const photosList =
           (Array.isArray(activeProfile?.photos) && activeProfile.photos) ||
@@ -84,6 +93,47 @@ export default function EditPhotosPage() {
       }
     }
     loadPhotos();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const p = authService.getProfile();
+      const u = authService.getUser();
+      const photosList =
+        (Array.isArray(p?.photos) && p.photos) ||
+        (Array.isArray(u?.photos) && u.photos) ||
+        [];
+
+      const newSlots = Array.from({ length: 6 }, (_, idx) => {
+        const item = photosList[idx];
+        if (item) {
+          const rawUrl = typeof item === "string" ? item : item.url || item.secure_url || "";
+          const photoId = typeof item === "object" ? item._id || item.id || null : null;
+          const isPrimary = typeof item === "object" ? Boolean(item.isPrimary) : idx === 0;
+          return {
+            id: idx,
+            url: resolveImageUrl(rawUrl),
+            rawUrl,
+            photoId,
+            isPrimary: isPrimary || idx === 0,
+          };
+        }
+        return { id: idx, url: "", rawUrl: "", photoId: null, isPrimary: idx === 0 };
+      });
+
+      if (!newSlots.some((s) => s.isPrimary && s.url)) {
+        const firstFilled = newSlots.find((s) => s.url);
+        if (firstFilled) firstFilled.isPrimary = true;
+        else newSlots[0].isPrimary = true;
+      }
+      setPhotoSlots(newSlots);
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [user, profile]);
 
   const handleFileUpload = async (index, file) => {

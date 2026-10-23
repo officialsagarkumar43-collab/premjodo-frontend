@@ -34,10 +34,24 @@ import socketService from "@/lib/services/socket.service";
 import { fetchWhoLikedYouProfiles } from "@/lib/common/api";
 import { useAuth } from "@/context/AuthContext";
 import authService from "@/lib/services/auth.service";
+import { useSwipeLimit } from "@/lib/hooks/useSwipeLimit";
+import { SwipeLimitModal } from "@/components/common/SwipeLimitModal";
 
 export default function WhoLikedYouPage() {
   const router = useRouter();
   const { user, profile: authProfile, subscription } = useAuth();
+  const {
+    swipesRemaining,
+    dailyLimit,
+    isUnlimited,
+    isLimitReached,
+    showLimitModal,
+    setShowLimitModal,
+    countdown,
+    checkCanSwipe,
+    limitErrorMessage,
+  } = useSwipeLimit();
+
   const [profiles, setProfiles] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -146,6 +160,11 @@ export default function WhoLikedYouPage() {
     const profileId = targetProfile._id || targetProfile.id || targetProfile.userId;
     if (!profileId) return;
 
+    // Check if free user is out of daily swipes
+    if (!checkCanSwipe()) {
+      return;
+    }
+
     // Trigger visual exit animation for grid
     setExitingCardId(profileId);
 
@@ -174,6 +193,14 @@ export default function WhoLikedYouPage() {
     // Call backend API
     try {
       const res = await matchService.swipeUser(profileId, action);
+
+      if (res?.limitReached) {
+        // Restore profile to list and show swipe limit modal
+        setProfiles((prev) => [targetProfile, ...prev.filter((p) => (p._id || p.id) !== profileId)]);
+        setTotalCount((prev) => prev + 1);
+        setShowLimitModal(true);
+        return;
+      }
 
       if (action === "like" || action === "superlike") {
         // Since they already liked the user, this creates a mutual match!
@@ -913,6 +940,16 @@ export default function WhoLikedYouPage() {
           </div>
         </div>
       )}
+
+      {/* Daily Swipe Limit / Low Quota Alert Modal */}
+      <SwipeLimitModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        dailyLimit={dailyLimit}
+        swipesRemaining={swipesRemaining}
+        countdown={countdown}
+        customMessage={limitErrorMessage}
+      />
     </div>
   );
 }

@@ -644,18 +644,34 @@ export const authService = {
         });
 
         if (response.status === 401) {
+          currentUserPromise = null;
           return null;
         }
 
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok || data?.success === false) {
+          currentUserPromise = null;
           return null;
         }
 
         const meData = data?.data || data || {};
         const rawUser = meData.user || (meData.email || meData._id ? meData : null);
-        const rawProfile = meData.profile || (meData.photos || meData.bio || meData.birthday || meData.gender ? meData : null);
+        let rawProfile = meData.profile || (meData.photos || meData.bio || meData.birthday || meData.gender || meData.lookingFor || meData.interests ? meData : null);
+
+        // Fallback: If user was returned but profile object wasn't included directly, attempt to fetch user's full profile
+        if ((!rawProfile || (!rawProfile.photos?.length && !rawProfile.bio && !rawProfile.interests?.length)) && rawUser?._id) {
+          try {
+            const profRes = await apiFetch(`/users/profile/${rawUser._id}`, { method: "GET" }).catch(() => null);
+            if (profRes && profRes.ok) {
+              const profData = await profRes.json().catch(() => ({}));
+              if (profData?.data || profData?.profile) {
+                rawProfile = profData.data || profData.profile;
+              }
+            }
+          } catch { }
+        }
+
         const isOnboarded = meData.isOnboarded ?? rawUser?.isOnboarded ?? rawProfile?.isOnboarded;
         const isFaceVerified =
           meData.isFaceVerification ??
@@ -726,7 +742,7 @@ export const authService = {
             isFaceVerified: isUserFaceVerified,
             ...(resolvedVip !== undefined ? { vipBadge: resolvedVip, isVip: Boolean(resolvedVip) } : {}),
           };
-          authService.setUser(updatedUser, false);
+          authService.setUser(updatedUser, true);
           meData.user = updatedUser;
         }
 
@@ -742,18 +758,19 @@ export const authService = {
             rawProfile.vipBadge = resolvedVip;
             rawProfile.isVip = Boolean(resolvedVip);
           }
-          authService.setProfile(rawProfile, false);
+          authService.setProfile(rawProfile, true);
           meData.profile = rawProfile;
         }
 
         return meData;
       } catch (error) {
+        currentUserPromise = null;
         console.warn("getCurrentUser note:", error?.message || error);
         return null;
       } finally {
         setTimeout(() => {
           currentUserPromise = null;
-        }, 1000);
+        }, 500);
       }
     })();
 

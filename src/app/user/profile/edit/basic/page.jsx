@@ -39,11 +39,20 @@ export default function EditBasicInfoPage() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    function loadData() {
+    let isMounted = true;
+    async function loadData() {
       setIsLoading(true);
       try {
-        const activeUser = authService.getUser() || user;
-        const activeProfile = authService.getProfile() || profile;
+        let activeUser = authService.getUser() || user;
+        let activeProfile = authService.getProfile() || profile;
+
+        if (!activeProfile || (!activeProfile.birthday && !activeProfile.gender)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) activeProfile = meData.profile;
+          if (meData?.user) activeUser = meData.user;
+        }
+
+        if (!isMounted) return;
 
         if (activeUser?.email) setEmail(activeUser.email);
         if (activeUser?.fullName) setFirstName(activeUser.fullName);
@@ -77,10 +86,44 @@ export default function EditBasicInfoPage() {
       } catch (err) {
         console.error("Error loading basic info:", err);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     }
     loadData();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const u = authService.getUser();
+      const p = authService.getProfile();
+      if (u?.email) setEmail(u.email);
+      if (u?.fullName) setFirstName(u.fullName);
+      else if (p?.fullName) setFirstName(p.fullName);
+      if (p?.birthday) {
+        if (typeof p.birthday === "object") {
+          if (p.birthday.year) setBirthYear(String(p.birthday.year));
+          if (p.birthday.month) setBirthMonth(String(p.birthday.month).padStart(2, "0"));
+          if (p.birthday.day) setBirthDay(String(p.birthday.day).padStart(2, "0"));
+        } else if (typeof p.birthday === "string") {
+          const parts = p.birthday.split("-");
+          if (parts[0]) setBirthYear(parts[0]);
+          if (parts[1]) setBirthMonth(parts[1]);
+          if (parts[2]) setBirthDay(parts[2]);
+        }
+      }
+      if (p?.gender) setGender(p.gender.toLowerCase());
+      if (p?.showGenderOnProfile !== undefined) setShowGender(Boolean(p.showGenderOnProfile));
+      if (p?.interestedIn) {
+        if (Array.isArray(p.interestedIn)) setInterestedIn(p.interestedIn.map((s) => String(s).toLowerCase()));
+        else if (typeof p.interestedIn === "string") setInterestedIn([p.interestedIn.toLowerCase()]);
+      }
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [user, profile]);
 
   const toggleInterestedIn = (key) => {

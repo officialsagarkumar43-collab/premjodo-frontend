@@ -76,9 +76,19 @@ export default function EditLifestylePage() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    function loadLifestyle() {
+    let isMounted = true;
+    async function loadLifestyle() {
       try {
-        const activeProfile = authService.getProfile() || profile;
+        let activeProfile = authService.getProfile() || profile;
+
+        if (!activeProfile || (!activeProfile.bio && !activeProfile.religion && !activeProfile.education)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) {
+            activeProfile = meData.profile;
+          }
+        }
+
+        if (!isMounted) return;
 
         if (activeProfile?.bio) setAboutMe(activeProfile.bio);
         else if (activeProfile?.aboutMe) setAboutMe(activeProfile.aboutMe);
@@ -93,6 +103,25 @@ export default function EditLifestylePage() {
       }
     }
     loadLifestyle();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const p = authService.getProfile();
+      if (p) {
+        if (p.bio) setAboutMe(p.bio);
+        else if (p.aboutMe) setAboutMe(p.aboutMe);
+        if (p.religion) setReligion(p.religion);
+        if (p.education) setEducation(p.education);
+        if (p.occupation || p.profession) setOccupation(p.occupation || p.profession);
+      }
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [profile]);
 
   const validate = () => {

@@ -37,15 +37,23 @@ export default function EditIntentPage() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadIntent() {
       try {
-        const activeProfile = authService.getProfile() || profile;
+        let activeProfile = authService.getProfile() || profile;
+
+        if (!activeProfile || (!activeProfile.lookingFor && !activeProfile.relationshipIntent)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) activeProfile = meData.profile;
+        }
+
+        if (!isMounted) return;
 
         if (activeProfile?.lookingFor) setSelectedIntent(activeProfile.lookingFor);
         else if (activeProfile?.relationshipIntent) setSelectedIntent(activeProfile.relationshipIntent);
 
         const fetched = await authService.getLookingForOptions().catch(() => []);
-        if (Array.isArray(fetched) && fetched.length > 0) {
+        if (Array.isArray(fetched) && fetched.length > 0 && isMounted) {
           setIntentOptions(
             fetched.map((f) => ({
               ...f,
@@ -59,6 +67,20 @@ export default function EditIntentPage() {
       }
     }
     loadIntent();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const p = authService.getProfile();
+      if (p?.lookingFor) setSelectedIntent(p.lookingFor);
+      else if (p?.relationshipIntent) setSelectedIntent(p.relationshipIntent);
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [profile]);
 
   const handleSave = async (andNext = false) => {

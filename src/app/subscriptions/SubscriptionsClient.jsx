@@ -155,6 +155,18 @@ export default function SubscriptionsClient({
 
     fetchAllData();
 
+    // If plans failed to load on initial mount (e.g. cold start), auto-retry once after 2.5s
+    const retryTimer = setTimeout(() => {
+      if (isMounted) {
+        setPlans((current) => {
+          if (!current || current.length === 0) {
+            fetchAllData();
+          }
+          return current;
+        });
+      }
+    }, 2500);
+
     const fallbackTimer = setTimeout(() => {
       if (isMounted) {
         setIsLoadingPlans(false);
@@ -164,6 +176,7 @@ export default function SubscriptionsClient({
 
     return () => {
       isMounted = false;
+      clearTimeout(retryTimer);
       clearTimeout(fallbackTimer);
     };
   }, [fetchAllData]);

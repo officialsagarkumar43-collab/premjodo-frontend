@@ -148,12 +148,12 @@ export default function UserSubscriptionsPage() {
     (planSlug.includes("platinum")
       ? "Prem Jodo Platinum"
       : planSlug.includes("gold")
-      ? "Prem Jodo Gold"
-      : planSlug.includes("plus")
-      ? "Prem Jodo Plus"
-      : planSlug.includes("diamond")
-      ? "Prem Jodo Diamond"
-      : "Free Explorer");
+        ? "Prem Jodo Gold"
+        : planSlug.includes("plus")
+          ? "Prem Jodo Plus"
+          : planSlug.includes("diamond")
+            ? "Prem Jodo Diamond"
+            : "Free Explorer");
 
   // Refund eligibility check (Cancel Plan button is only shown if refund is eligible)
   const refundEligibility =
@@ -199,10 +199,16 @@ export default function UserSubscriptionsPage() {
       const maxBCount =
         subscription.perks?.profileBoostPerMonth ??
         (planSlug.includes("platinum") ? 2 : 1);
+      const isUnlimitedSwp = Boolean(subscription.perks?.unlimitedSwipes || isUserVip);
+      const dailySwpLimit = subscription.dailySwipeLimit ?? subscription.perks?.dailySwipeLimit ?? 50;
+      const swpUsed = subscription.swipesUsedToday ?? 0;
+      const swpRemaining = typeof subscription.swipesRemainingToday === "number"
+        ? subscription.swipesRemainingToday
+        : Math.max(0, dailySwpLimit - swpUsed);
+
       const rew =
         subscription.perks?.rewindAllowed || isUserVip ? "Unlimited" : "1 / Day";
-      const swp =
-        subscription.perks?.unlimitedSwipes || isUserVip ? "Unlimited" : 50;
+      const swp = isUnlimitedSwp ? "Unlimited" : swpRemaining;
       const dm =
         subscription.directMessagesRemaining ??
         (subscription.perks?.messageBeforeMatch ? 5 : 2);
@@ -218,6 +224,8 @@ export default function UserSubscriptionsPage() {
         maxDirectMessages: Math.max(dm, maxDm),
         rewinds: rew,
         swipes: swp,
+        maxSwipes: isUnlimitedSwp ? "Unlimited" : dailySwpLimit,
+        swipesUsed: swpUsed,
       };
     } else if (planSlug.includes("diamond")) {
       base = {
@@ -946,8 +954,8 @@ export default function UserSubscriptionsPage() {
           type="button"
           onClick={() => setActiveTab("my-plan")}
           className={`flex-1 min-w-[130px] sm:min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer whitespace-nowrap select-none ${activeTab === "my-plan"
-              ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
-              : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+            ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
+            : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
             }`}
         >
           <Crown className="w-4 h-4 text-amber-500 shrink-0" />
@@ -958,8 +966,8 @@ export default function UserSubscriptionsPage() {
           type="button"
           onClick={() => setActiveTab("plans")}
           className={`flex-1 min-w-[130px] sm:min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer whitespace-nowrap select-none ${activeTab === "plans"
-              ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
-              : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+            ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
+            : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
             }`}
         >
           <Sparkles className="w-4 h-4 text-rose-500 shrink-0" />
@@ -970,8 +978,8 @@ export default function UserSubscriptionsPage() {
           type="button"
           onClick={() => setActiveTab("topups")}
           className={`flex-1 min-w-[140px] sm:min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer whitespace-nowrap select-none ${activeTab === "topups"
-              ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
-              : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+            ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
+            : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
             }`}
         >
           <ShoppingBag className="w-4 h-4 text-indigo-500 shrink-0" />
@@ -985,8 +993,8 @@ export default function UserSubscriptionsPage() {
           type="button"
           onClick={() => setActiveTab("billing")}
           className={`flex-1 min-w-[130px] sm:min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer whitespace-nowrap select-none ${activeTab === "billing"
-              ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
-              : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+            ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs scale-[1.01]"
+            : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
             }`}
         >
           <Receipt className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -1010,15 +1018,14 @@ export default function UserSubscriptionsPage() {
                     Active Membership
                   </span>
                   <span
-                    className={`px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
-                      isUserVip
+                    className={`px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${isUserVip
                         ? planSlug.includes("platinum")
                           ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs"
                           : planSlug.includes("gold")
-                          ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-xs"
-                          : "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs"
+                            ? "bg-gradient-to-r from-amber-400 to-amber-500 text-black shadow-xs"
+                            : "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs"
                         : "bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700"
-                    }`}
+                      }`}
                   >
                     {isUserVip ? <Crown className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                     {activePlanName}
@@ -1251,11 +1258,10 @@ export default function UserSubscriptionsPage() {
                     </div>
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                      hasMessageBeforeMatch
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${hasMessageBeforeMatch
                         ? "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300"
                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
-                    }`}
+                      }`}
                   >
                     {hasMessageBeforeMatch ? "Unlocked" : "Locked"}
                   </span>
@@ -1292,24 +1298,46 @@ export default function UserSubscriptionsPage() {
 
               {/* 5. Daily Swipes */}
               <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs flex flex-col justify-between space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center">
-                      <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center">
+                        <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">Daily Swipes</h4>
+                        <p className="text-[10px] sm:text-[11px] text-zinc-500">Discover nearby profiles</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">Daily Swipes</h4>
-                      <p className="text-[10px] sm:text-[11px] text-zinc-500">Discover nearby profiles</p>
-                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                      {isUserVip || subscription?.perks?.unlimitedSwipes
+                        ? "Unlimited"
+                        : `${credits.swipes} / ${credits.maxSwipes || 50} Left`}
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
-                    {isUserVip ? "Unlimited" : "50 / Day"}
-                  </span>
+
+                  {/* Progress bar for free account daily swipes */}
+                  {!isUserVip && !subscription?.perks?.unlimitedSwipes && typeof credits.swipes === "number" && (
+                    <div className="mt-3">
+                      <div className="w-full h-1.5 sm:h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-pink-500 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              Math.round((credits.swipes / (Number(credits.maxSwipes) || 50)) * 100)
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
+
                 <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  {isUserVip
+                  {isUserVip || subscription?.perks?.unlimitedSwipes
                     ? "No swipe limits. Connect with matches freely without interruptions."
-                    : "Standard account limit resets every 24 hours at midnight IST."}
+                    : `Used ${credits.swipesUsed || 0} of ${credits.maxSwipes || 50} free swipes today. Resets daily at midnight IST.`}
                 </p>
               </div>
 
@@ -1326,8 +1354,8 @@ export default function UserSubscriptionsPage() {
                     </div>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${isUserVip
-                      ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
-                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+                    ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
                     }`}>
                     {isUserVip ? "Unlocked" : "Locked"}
                   </span>
@@ -1370,8 +1398,8 @@ export default function UserSubscriptionsPage() {
                     type="button"
                     onClick={() => setBillingCycle(cycle.id)}
                     className={`flex-1 sm:flex-initial px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isSelected
-                        ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs font-bold"
-                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                      ? "bg-white dark:bg-zinc-800 text-rose-600 dark:text-rose-400 shadow-xs font-bold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
                       }`}
                   >
                     <span>{cycle.label}</span>
@@ -1448,13 +1476,12 @@ export default function UserSubscriptionsPage() {
                 return (
                   <div
                     key={plan.slug || plan._id}
-                    className={`relative rounded-3xl p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 border ${
-                      isCurrent
+                    className={`relative rounded-3xl p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 border ${isCurrent
                         ? "bg-gradient-to-b from-emerald-500/10 via-white to-white dark:from-emerald-950/20 dark:via-zinc-900 dark:to-zinc-900 border-2 border-emerald-500 shadow-xl shadow-emerald-500/10 ring-2 ring-emerald-500/20 z-10 scale-[1.01]"
                         : isPopular
-                        ? "bg-gradient-to-b from-rose-50/60 via-white to-white dark:from-rose-950/20 dark:via-zinc-900 dark:to-zinc-900 border-rose-400/80 dark:border-rose-500/40 shadow-lg shadow-rose-500/10"
-                        : "bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md"
-                    }`}
+                          ? "bg-gradient-to-b from-rose-50/60 via-white to-white dark:from-rose-950/20 dark:via-zinc-900 dark:to-zinc-900 border-rose-400/80 dark:border-rose-500/40 shadow-lg shadow-rose-500/10"
+                          : "bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md"
+                      }`}
                   >
                     {isCurrent ? (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -1541,11 +1568,10 @@ export default function UserSubscriptionsPage() {
                           type="button"
                           onClick={() => handleSubscribe(plan)}
                           disabled={isProcessing || isLoadingPlans}
-                          className={`w-full py-3 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
-                            isPopular
+                          className={`w-full py-3 rounded-xl text-xs font-bold text-white transition-all shadow-xs active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${isPopular
                               ? "bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:opacity-95 shadow-rose-500/25"
                               : "bg-zinc-900 hover:bg-zinc-800 dark:bg-rose-600 dark:hover:bg-rose-500"
-                          }`}
+                            }`}
                         >
                           {isProcessing ? (
                             <>

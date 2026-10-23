@@ -34,9 +34,17 @@ export default function EditPreferencesPage() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    function loadPreferences() {
+    let isMounted = true;
+    async function loadPreferences() {
       try {
-        const activeProfile = authService.getProfile() || profile;
+        let activeProfile = authService.getProfile() || profile;
+
+        if (!activeProfile || (!activeProfile.interestedIn && !activeProfile.ageRange)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) activeProfile = meData.profile;
+        }
+
+        if (!isMounted) return;
 
         if (activeProfile?.interestedIn) {
           if (Array.isArray(activeProfile.interestedIn)) {
@@ -60,6 +68,28 @@ export default function EditPreferencesPage() {
       }
     }
     loadPreferences();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const p = authService.getProfile();
+      if (p?.interestedIn) {
+        if (Array.isArray(p.interestedIn)) setInterestedIn(p.interestedIn.map((s) => String(s).toLowerCase()));
+        else if (typeof p.interestedIn === "string") setInterestedIn([p.interestedIn.toLowerCase()]);
+      }
+      if (p?.ageRange) {
+        if (p.ageRange.min) setMinAge(p.ageRange.min);
+        if (p.ageRange.max) setMaxAge(p.ageRange.max);
+      }
+      if (p?.maxDistance) setMaxDistance(p.maxDistance);
+      if (p?.showInDiscovery !== undefined) setShowInDiscovery(Boolean(p.showInDiscovery));
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [profile]);
 
   const toggleInterestedIn = (key) => {

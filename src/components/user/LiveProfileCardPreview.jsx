@@ -23,15 +23,34 @@ export function LiveProfileCardPreview({
   const [syncedUser, setSyncedUser] = useState(() => authService.getUser() || propUser || {});
 
   useEffect(() => {
+    let isMounted = true;
     const handleAuthChange = () => {
+      if (!isMounted) return;
       const p = authService.getProfile();
       const u = authService.getUser();
       if (p) setSyncedProfile(p);
       if (u) setSyncedUser(u);
     };
 
+    // If profile is not yet available, trigger a background fetch
+    const p = authService.getProfile();
+    if (!p && authService.isAuthenticated()) {
+      authService
+        .getCurrentUser()
+        .then((meData) => {
+          if (isMounted && meData) {
+            if (meData.profile) setSyncedProfile(meData.profile);
+            if (meData.user) setSyncedUser(meData.user);
+          }
+        })
+        .catch(() => {});
+    }
+
     window.addEventListener("pj-auth-changed", handleAuthChange);
-    return () => window.removeEventListener("pj-auth-changed", handleAuthChange);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, []);
 
   useEffect(() => {

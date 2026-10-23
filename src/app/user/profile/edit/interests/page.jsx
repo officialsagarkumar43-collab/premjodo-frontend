@@ -41,11 +41,19 @@ export default function EditInterestsPage() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadInterests() {
       try {
-        const activeProfile = authService.getProfile() || profile;
+        let activeProfile = authService.getProfile() || profile;
 
-        if (Array.isArray(activeProfile?.interests)) {
+        if (!activeProfile || !Array.isArray(activeProfile.interests)) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (meData?.profile) {
+            activeProfile = meData.profile;
+          }
+        }
+
+        if (Array.isArray(activeProfile?.interests) && isMounted) {
           const names = activeProfile.interests.map((i) =>
             typeof i === "string" ? i : i.name || i.tag || ""
           ).filter(Boolean);
@@ -53,7 +61,7 @@ export default function EditInterestsPage() {
         }
 
         const tags = await authService.getInterests().catch(() => []);
-        if (Array.isArray(tags) && tags.length > 0) {
+        if (Array.isArray(tags) && tags.length > 0 && isMounted) {
           const tagNames = tags.map((t) => (typeof t === "string" ? t : t.name || t.tag || "")).filter(Boolean);
           const combined = Array.from(new Set([...POPULAR_INTERESTS, ...tagNames]));
           setAvailableInterests(combined);
@@ -63,6 +71,24 @@ export default function EditInterestsPage() {
       }
     }
     loadInterests();
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const p = authService.getProfile();
+      if (p && Array.isArray(p.interests)) {
+        const names = p.interests.map((i) =>
+          typeof i === "string" ? i : i.name || i.tag || ""
+        ).filter(Boolean);
+        setSelectedInterests(names);
+      }
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
   }, [profile]);
 
   const toggleInterest = (tag) => {

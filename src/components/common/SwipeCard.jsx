@@ -12,10 +12,14 @@ import {
   Sparkles,
   SlidersHorizontal,
   Zap,
+  Flame,
+  Crown,
 } from "lucide-react";
 import { resolveImageUrl } from "@/lib/utility/imageUrl";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useSwipeLimit } from "@/lib/hooks/useSwipeLimit";
+import { SwipeLimitModal } from "@/components/common/SwipeLimitModal";
 
 export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFilters }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,9 +41,31 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
   const canRewindUnlimited = Boolean(subscription?.perks?.rewindAllowed || isVip);
   const nextNextProfile = profiles[currentIndex + 2];
 
+  // Daily Swipe Limit live tracker hook
+  const {
+    swipesRemaining,
+    dailyLimit,
+    isUnlimited,
+    isLimitReached,
+    showLimitModal,
+    setShowLimitModal,
+    countdown,
+    checkCanSwipe,
+    limitErrorMessage,
+    recordSwipeSuccess,
+    recordRewindSuccess,
+  } = useSwipeLimit();
+
   // Execute swipe animation smoothly then advance index
   const triggerSwipe = useCallback((direction) => {
     if (swipeDirection || currentIndex >= profiles.length) return;
+
+    // Check if daily swipe limit has been reached
+    if (!checkCanSwipe()) {
+      setDragOffset({ x: 0, y: 0 });
+      return;
+    }
+
     setSwipeDirection(direction);
 
     if (onSwipe && currentProfile) {
@@ -50,6 +76,7 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
       };
       const action = actionMap[direction] || "like";
       onSwipe(currentProfile, action);
+      recordSwipeSuccess();
     }
 
     setTimeout(() => {
@@ -93,6 +120,7 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
     setSwipeDirection(null);
     if (onRewind && profiles[prevIndex]) {
       onRewind(profiles[prevIndex]);
+      recordRewindSuccess();
     }
   };
 
@@ -138,10 +166,22 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
       const verticalThreshold = -90;
 
       if (deltaX > horizontalThreshold) {
+        if (!checkCanSwipe()) {
+          setDragOffset({ x: 0, y: 0 });
+          return;
+        }
         triggerSwipe("right");
       } else if (deltaX < -horizontalThreshold) {
+        if (!checkCanSwipe()) {
+          setDragOffset({ x: 0, y: 0 });
+          return;
+        }
         triggerSwipe("left");
       } else if (deltaY < verticalThreshold && Math.abs(deltaX) < 60) {
+        if (!checkCanSwipe()) {
+          setDragOffset({ x: 0, y: 0 });
+          return;
+        }
         triggerSwipe("up");
       } else {
         // Snap back to center
@@ -514,6 +554,16 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
           </button>
         </div>
       </div>
+
+      {/* Daily Swipe Limit / Low Quota Alert Modal */}
+      <SwipeLimitModal
+        isOpen={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        dailyLimit={dailyLimit}
+        swipesRemaining={swipesRemaining}
+        countdown={countdown}
+        customMessage={limitErrorMessage}
+      />
     </div>
   );
 }

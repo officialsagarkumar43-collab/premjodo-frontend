@@ -1630,7 +1630,7 @@ function MatchesAndChatContent() {
                       isOnline
                         ? "bg-gradient-to-tr from-rose-500 via-pink-500 to-amber-400"
                         : "bg-zinc-200 dark:bg-zinc-700/60",
-                      isMatchActive && "ring-2 ring-rose-500/40 ring-offset-2 dark:ring-offset-zinc-900"
+                      isOnline && isMatchActive && "ring-2 ring-rose-500/40 ring-offset-2 dark:ring-offset-zinc-900"
                     )}
                   >
                     <img

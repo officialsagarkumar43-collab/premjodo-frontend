@@ -59,21 +59,50 @@ export default function UserProfileDashboardPage() {
     supportedLanguages?.[0] || { code: "en", name: "English", nativeName: "English" };
 
   useEffect(() => {
-    function loadData() {
+    let isMounted = true;
+    async function loadData() {
       setIsLoading(true);
       try {
         const u = authService.getUser() || user;
-        const p = authService.getProfile() || profile;
-        setActiveUser(u);
-        setActiveProfile(p);
+        let p = authService.getProfile() || profile;
+        if (isMounted) {
+          if (u) setActiveUser(u);
+          if (p) setActiveProfile(p);
+        }
+
+        // Autofetch from backend if profile is missing key details or on mount
+        const hasFullProfile = Boolean(p && (p.bio || p.photos?.length || p.birthday || p.lookingFor || p.interests?.length));
+        if (!hasFullProfile || !p) {
+          const meData = await authService.getCurrentUser(true).catch(() => null);
+          if (isMounted && meData) {
+            if (meData.user) setActiveUser(meData.user);
+            if (meData.profile) setActiveProfile(meData.profile);
+            if (typeof syncAuth === "function") syncAuth(true);
+          }
+        }
       } catch (err) {
         console.error("Error loading profile:", err);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     }
     loadData();
-  }, [user, profile]);
+
+    const handleAuthChange = () => {
+      if (!isMounted) return;
+      const u = authService.getUser();
+      const p = authService.getProfile();
+      if (u) setActiveUser(u);
+      if (p) setActiveProfile(p);
+    };
+
+    window.addEventListener("pj-auth-changed", handleAuthChange);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("pj-auth-changed", handleAuthChange);
+    };
+  }, [user, profile, syncAuth]);
 
   const handleLogout = async () => {
     socketService.disconnect();

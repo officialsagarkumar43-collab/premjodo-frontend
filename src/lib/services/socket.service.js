@@ -73,6 +73,7 @@ const readReceiptListeners = new Set();
 const incomingCallListeners = new Set();
 const callAcceptedListeners = new Set();
 const callEndedListeners = new Set();
+const membershipListeners = new Set();
 
 const notifyOnlineListeners = () => {
   const usersList = Array.from(onlineUsers);
@@ -349,6 +350,44 @@ const initSocket = () => {
       socket.on(ev, handleReadReceipt);
     });
 
+    // Membership & Swipe Quota balance updates
+    const handleMembershipUpdated = (data) => {
+      if (!data) return;
+      membershipListeners.forEach((cb) => {
+        try {
+          cb(data);
+        } catch (e) {
+          console.warn("Membership listener error:", e);
+        }
+      });
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("pj-membership-updated", { detail: data }));
+        if (data?.swipesRemainingToday !== undefined || data?.swipesUsedToday !== undefined) {
+          window.dispatchEvent(
+            new CustomEvent("pj-swipes-updated", {
+              detail: {
+                swipesUsedToday: data?.swipesUsedToday,
+                swipesRemainingToday: data?.swipesRemainingToday,
+                dailySwipeLimit: data?.dailySwipeLimit,
+                unlimitedSwipes: data?.subscription?.perks?.unlimitedSwipes,
+                subscription: data?.subscription,
+              },
+            })
+          );
+        }
+      }
+    };
+    [
+      "membership_updated",
+      "membershipUpdated",
+      "swipe_limit_updated",
+      "subscription_updated",
+      "superlike_used",
+    ].forEach((ev) => {
+      socket.on(ev, handleMembershipUpdated);
+    });
+
     // Calls
     const callEvents = [
       "incoming_call",
@@ -596,6 +635,15 @@ export const socketService = {
     conversationListeners.add(callback);
     return () => {
       conversationListeners.delete(callback);
+    };
+  },
+
+  onMembershipUpdated(callback) {
+    if (typeof callback !== "function") return () => { };
+    initSocket();
+    membershipListeners.add(callback);
+    return () => {
+      membershipListeners.delete(callback);
     };
   },
 
