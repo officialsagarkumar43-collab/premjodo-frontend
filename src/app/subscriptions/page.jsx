@@ -1,4 +1,4 @@
-import SubscriptionsClient from "./SubscriptionsClient";
+import SubscriptionsClient, { DEFAULT_PLANS } from "./SubscriptionsClient";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -53,7 +53,7 @@ export default async function SubscriptionsPage() {
 
   return (
     <SubscriptionsClient
-      initialPlans={plans}
+      initialPlans={plans && plans.length > 0 ? plans : DEFAULT_PLANS}
       initialBillingCycles={billingCycles}
     />
   );

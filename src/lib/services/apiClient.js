@@ -232,7 +232,7 @@ export async function apiFetch(endpoint, options = {}) {
       requestHeaders["Content-Type"] = "application/json";
     }
 
-    if (token) {
+    if (token && !options.skipAuth && options.auth !== false) {
       const cleanToken = String(token).trim().replace(/^Bearer\s+/i, "");
       requestHeaders["Authorization"] = `Bearer ${cleanToken}`;
     }

@@ -183,6 +183,8 @@ export function LanguageProvider({ children }) {
 
       if (typeof current === "string") {
         englishText = current;
+      } else if (fallback !== undefined && fallback !== null) {
+        englishText = fallback;
       }
 
       // If active language is English, return English string directly

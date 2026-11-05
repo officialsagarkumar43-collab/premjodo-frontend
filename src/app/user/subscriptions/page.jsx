@@ -1469,6 +1469,9 @@ export default function UserSubscriptionsPage() {
                 const pricing = isAnnual ? plan.pricing?.annual : plan.pricing?.monthly;
                 const pricePerMonth = pricing?.pricePerMonth ?? (isAnnual ? 399 : 599);
                 const totalAmount = pricing?.totalAmount ?? (isAnnual ? pricePerMonth * 12 : pricePerMonth);
+                const monthlyRate = plan.pricing?.monthly?.pricePerMonth || plan.pricing?.monthly?.totalAmount;
+                const undiscountedYearly = monthlyRate ? monthlyRate * 12 : null;
+                const oldYearlyPrice = pricing?.originalPrice || pricing?.originalAmount || pricing?.mrp || undiscountedYearly;
                 const isCurrent = isCurrentPlanActive(plan);
                 const isPopular = plan.isPopular || plan.slug === "platinum" || plan.slug === "gold";
                 const isProcessing = processingPlanSlug === plan.slug;
@@ -1527,8 +1530,13 @@ export default function UserSubscriptionsPage() {
                           <span className="text-xs text-zinc-500 font-medium">/ month</span>
                         </div>
                         {isAnnual && (
-                          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">
-                            Billed annually at ₹{totalAmount}/yr
+                          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                            {oldYearlyPrice && oldYearlyPrice > totalAmount && (
+                              <span className="line-through text-red-500 font-semibold">
+                                ₹{oldYearlyPrice}
+                              </span>
+                            )}
+                            <span>Billed annually at <strong className="text-emerald-600 dark:text-emerald-400">₹{totalAmount}/yr</strong></span>
                           </p>
                         )}
                       </div>

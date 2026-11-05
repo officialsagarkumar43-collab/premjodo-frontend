@@ -32,6 +32,99 @@ const AuthModal = dynamic(
   { ssr: false }
 );
 
+export const DEFAULT_PLANS = [
+  {
+    _id: "plan_plus",
+    slug: "plus",
+    name: "Prem Jodo Plus",
+    subtitle: "ESSENTIAL",
+    tag: "ESSENTIAL",
+    description: "Supercharge your discovery with unlimited swipes & rewind.",
+    icon: "zap",
+    displayOrder: 1,
+    isMostPopular: false,
+    pricing: {
+      monthly: {
+        pricePerMonth: 49,
+        totalAmount: 49,
+        discountPercent: 0,
+      },
+      annual: {
+        pricePerMonth: 33,
+        totalAmount: 396,
+        discountPercent: 33,
+      },
+    },
+    features: [
+      "Unlimited Swipes every day",
+      "Rewind your accidental left swipes",
+      "5 Free Super Likes per week",
+      "Passport to swipe singles anywhere in India",
+      "No advertisement distractions",
+    ],
+  },
+  {
+    _id: "plan_gold",
+    slug: "gold",
+    name: "Prem Jodo Gold",
+    subtitle: "ACTIVE PLAN",
+    tag: "ACTIVE PLAN",
+    description: "See who likes you instantly and match without waiting.",
+    icon: "crown",
+    displayOrder: 2,
+    isMostPopular: true,
+    pricing: {
+      monthly: {
+        pricePerMonth: 199,
+        totalAmount: 199,
+        discountPercent: 0,
+      },
+      annual: {
+        pricePerMonth: 133,
+        totalAmount: 1596,
+        discountPercent: 33,
+      },
+    },
+    features: [
+      "See Who Liked You before swiping",
+      "1 Free Profile Boost per month (10x views)",
+      "Curated daily Top Picks matching your vibe",
+      "Unlimited Swipes & Rewinds",
+      "5 Free Super Likes every week",
+    ],
+  },
+  {
+    _id: "plan_platinum",
+    slug: "platinum",
+    name: "Prem Jodo Platinum",
+    subtitle: "VIP DATING",
+    tag: "VIP DATING",
+    description: "Priority placement, VIP badge, and direct note before match.",
+    icon: "sparkles",
+    displayOrder: 3,
+    isMostPopular: false,
+    pricing: {
+      monthly: {
+        pricePerMonth: 299,
+        totalAmount: 299,
+        discountPercent: 0,
+      },
+      annual: {
+        pricePerMonth: 200,
+        totalAmount: 2400,
+        discountPercent: 33,
+      },
+    },
+    features: [
+      "Priority Likes – Be seen first by everyone you like",
+      "Message Before Match – Add a personal note to Super Likes",
+      "Exclusive VIP Profile badge",
+      "See Who Liked You instantly",
+      "2 Free Profile Boosts per month",
+    ],
+  },
+];
+
 export default function SubscriptionsClient({
   initialPlans = [],
   initialBillingCycles = null,
@@ -74,7 +167,7 @@ export default function SubscriptionsClient({
         (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
       );
     }
-    return [];
+    return DEFAULT_PLANS;
   });
   const [billingCycles, setBillingCycles] = useState(
     initialBillingCycles || [
@@ -82,9 +175,6 @@ export default function SubscriptionsClient({
       { id: "annual", label: "Annual Billing", discount: "SAVE 33%" },
     ]
   );
-  // Initial loading spinner state until both plans and user subscription status are fetched from API
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   const [processingPlanSlug, setProcessingPlanSlug] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -102,8 +192,6 @@ export default function SubscriptionsClient({
 
   // Dedicated data loader to fetch fresh plans & active subscription concurrently from API
   const fetchAllData = useCallback(async () => {
-    setIsLoadingPlans(true);
-    setIsInitialLoading(true);
     try {
       const promises = [];
 
@@ -143,42 +231,12 @@ export default function SubscriptionsClient({
       await Promise.all(promises);
     } catch (err) {
       console.warn("[SubscriptionsClient] Error loading initial plans data:", err);
-    } finally {
-      setIsLoadingPlans(false);
-      setIsInitialLoading(false);
     }
   }, [refreshSubscription]);
 
-  // Initial mount: fetch all data and prevent infinite spinner with fallback timer
+  // Initial mount: fetch fresh data in background without blocking UI
   useEffect(() => {
-    let isMounted = true;
-
     fetchAllData();
-
-    // If plans failed to load on initial mount (e.g. cold start), auto-retry once after 2.5s
-    const retryTimer = setTimeout(() => {
-      if (isMounted) {
-        setPlans((current) => {
-          if (!current || current.length === 0) {
-            fetchAllData();
-          }
-          return current;
-        });
-      }
-    }, 2500);
-
-    const fallbackTimer = setTimeout(() => {
-      if (isMounted) {
-        setIsLoadingPlans(false);
-        setIsInitialLoading(false);
-      }
-    }, 6000);
-
-    return () => {
-      isMounted = false;
-      clearTimeout(retryTimer);
-      clearTimeout(fallbackTimer);
-    };
   }, [fetchAllData]);
 
   // Keep subscription fresh when auth changes dynamically
@@ -188,15 +246,9 @@ export default function SubscriptionsClient({
     }
   }, [isAuthenticated, refreshSubscription]);
 
-  // Unified loading flag: true during initial load or while fetching API data / auth sync
-  const isDataLoading =
-    isInitialLoading ||
-    isLoadingPlans ||
-    (typeof window !== "undefined" && authService.isAuthenticated() && authLoading);
-
   // Memoized sorted plans list
   const sortedPlans = useMemo(() => {
-    if (!Array.isArray(plans)) return [];
+    if (!Array.isArray(plans) || plans.length === 0) return DEFAULT_PLANS;
     return [...plans].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   }, [plans]);
 
@@ -313,8 +365,8 @@ export default function SubscriptionsClient({
     setErrorMessage("");
     setStatusMessage("");
 
-    // Guard against checkout calls while verifying initial data or processing
-    if (isDataLoading || processingPlanSlug || isVerifying) {
+    // Guard against checkout calls while processing or verifying
+    if (processingPlanSlug || isVerifying) {
       return;
     }
 
@@ -523,23 +575,7 @@ export default function SubscriptionsClient({
           className={`sub-pricing-section sub-reveal ${isPlansVisible ? "sub-reveal-visible" : ""}`}
         >
           <div className="sub-pricing-container">
-            {isDataLoading ? (
-              <div className="sub-plans-loading-wrapper">
-                <div className="sub-plans-spinner-container">
-                  <div className="sub-plans-spinner-ring" />
-                  <div className="sub-plans-spinner-glow" />
-                  <Crown className="sub-plans-spinner-icon" />
-                </div>
-                <div className="sub-plans-loading-content">
-                  <h3 className="sub-plans-loading-heading">Loading Membership Plans...</h3>
-                </div>
-                <div className="sub-plans-loading-dots">
-                  <span className="sub-loading-dot" />
-                  <span className="sub-loading-dot" />
-                  <span className="sub-loading-dot" />
-                </div>
-              </div>
-            ) : sortedPlans.length === 0 ? (
+            {sortedPlans.length === 0 ? (
               <div className="sub-plans-empty-wrapper">
                 <AlertCircle className="w-10 h-10 text-amber-500 mb-2" />
                 <h3 className="sub-plans-loading-heading">Unable to Load Plans</h3>
@@ -559,17 +595,62 @@ export default function SubscriptionsClient({
                 {sortedPlans.map((plan, index) => {
                   const Icon = getPlanIcon(plan.icon);
                   const isAnnual = billingCycle === "annual" || billingCycle === "yearly";
-                  const pricingData = isAnnual ? plan.pricing?.annual : plan.pricing?.monthly;
+                  const monthlyPricing = plan.pricing?.monthly;
+                  const annualPricing = plan.pricing?.annual;
+                  const pricingData = isAnnual ? annualPricing : monthlyPricing;
+
+                  const monthlyPrice =
+                    monthlyPricing?.pricePerMonth ??
+                    (typeof monthlyPricing?.totalAmount === "number" ? monthlyPricing.totalAmount : null);
+
                   const totalAmount =
-                    pricingData?.totalAmount ?? (isAnnual ? (pricingData?.pricePerMonth ? pricingData.pricePerMonth * 12 : 2388) : pricingData?.pricePerMonth || 299);
+                    pricingData?.totalAmount ??
+                    (isAnnual
+                      ? (pricingData?.pricePerMonth ? pricingData.pricePerMonth * 12 : (monthlyPrice ? monthlyPrice * 12 : 2388))
+                      : pricingData?.pricePerMonth || 299);
+
                   const pricePerMonth =
-                    pricingData?.pricePerMonth ?? (isAnnual ? Math.round(totalAmount / 12) : 299);
-                  const discountPercent = pricingData?.discountPercent ?? (isAnnual ? 33 : 0);
+                    pricingData?.pricePerMonth ??
+                    (isAnnual ? Math.round(totalAmount / 12) : totalAmount);
+
+                  // Determine cutoff old price if discount exists
+                  let oldPrice = null;
+                  if (isAnnual) {
+                    if (pricingData?.originalPrice && pricingData.originalPrice > totalAmount) {
+                      oldPrice = pricingData.originalPrice;
+                    } else if (pricingData?.originalAmount && pricingData.originalAmount > totalAmount) {
+                      oldPrice = pricingData.originalAmount;
+                    } else if (pricingData?.mrp && pricingData.mrp > totalAmount) {
+                      oldPrice = pricingData.mrp;
+                    } else if (monthlyPrice && (monthlyPrice * 12) > totalAmount) {
+                      oldPrice = monthlyPrice * 12;
+                    } else if (pricingData?.discountPercent > 0 && pricingData.discountPercent < 100) {
+                      oldPrice = Math.round(totalAmount / (1 - pricingData.discountPercent / 100));
+                    }
+                  } else {
+                    if (pricingData?.originalPrice && pricingData.originalPrice > pricePerMonth) {
+                      oldPrice = pricingData.originalPrice;
+                    } else if (pricingData?.mrp && pricingData.mrp > pricePerMonth) {
+                      oldPrice = pricingData.mrp;
+                    }
+                  }
+
+                  // Determine discount percent
+                  let discountPercent = pricingData?.discountPercent;
+                  if (discountPercent === undefined || discountPercent === null) {
+                    if (oldPrice && totalAmount && oldPrice > totalAmount) {
+                      discountPercent = Math.round(((oldPrice - totalAmount) / oldPrice) * 100);
+                    } else if (isAnnual) {
+                      discountPercent = 33;
+                    } else {
+                      discountPercent = 0;
+                    }
+                  }
 
                   const mainPrice = isAnnual ? totalAmount : pricePerMonth;
                   const mainPeriod = isAnnual
-                    ? (t("subscriptionsPage.perYear") || "/ year")
-                    : (t("subscriptionsPage.perMonth") || "/ month");
+                    ? (t("subscriptionsPage.perYear", "/year") || "/year")
+                    : (t("subscriptionsPage.perMonth", "/month") || "/month");
 
                   const isProcessing = processingPlanSlug === plan.slug;
                   const isUserActivePlan = isCurrentPlanActive(plan);
@@ -630,6 +711,11 @@ export default function SubscriptionsClient({
 
                         <div className="sub-price-box">
                           <div className="sub-price-row">
+                            {oldPrice && oldPrice > mainPrice ? (
+                              <span className="sub-price-cutoff">
+                                ₹{oldPrice}
+                              </span>
+                            ) : null}
                             <span className="sub-price-amount">
                               ₹{mainPrice}
                             </span>
@@ -657,7 +743,7 @@ export default function SubscriptionsClient({
 
                       <button
                         onClick={() => {
-                          if (isDataLoading) return;
+                          if (isProcessing) return;
                           if (isUserVip && !isUserActivePlan) {
                             router.push("/user/subscriptions?tab=topups");
                             return;
@@ -666,8 +752,7 @@ export default function SubscriptionsClient({
                         }}
                         disabled={
                           isProcessing ||
-                          isUserActivePlan ||
-                          isDataLoading
+                          isUserActivePlan
                         }
                         className={`sub-cta-btn ${isUserActivePlan
                           ? "sub-cta-active"
@@ -682,11 +767,6 @@ export default function SubscriptionsClient({
                           <>
                             <Loader2 className="sub-spinner" />
                             <span>Securing Checkout...</span>
-                          </>
-                        ) : isDataLoading ? (
-                          <>
-                            <Loader2 className="sub-spinner" />
-                            <span>Checking Plan...</span>
                           </>
                         ) : isUserActivePlan ? (
                           <span>Currently Subscribed</span>

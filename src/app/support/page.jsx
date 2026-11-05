@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/common/Navbar";
@@ -8,6 +8,7 @@ import { Footer } from "@/components/common/Footer";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { useIntersectionObserver } from "@/lib/hooks/useIntersectionObserver";
+import ticketService, { TICKET_CATEGORIES } from "@/lib/services/ticket.service";
 import "@/styles/support.css";
 
 import {
@@ -18,6 +19,12 @@ import {
   LifeBuoy,
   ShieldCheck,
   CheckCircle2,
+  AlertCircle,
+  Loader2,
+  UserCheck,
+  HelpCircle,
+  Clock,
+  Send,
 } from "lucide-react";
 
 // Code-splitting AuthModal and CustomSelect
@@ -34,11 +41,34 @@ const CustomSelect = dynamic(
 export default function SupportPage() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { user, profile, isAuthenticated } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", topic: "general", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [ticketResult, setTicketResult] = useState(null);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    category: "general_support",
+    subject: "",
+    description: "",
+    priority: "medium",
+  });
+
+  // Auto-fill details for logged in members
+  useEffect(() => {
+    if (isAuthenticated && (user || profile)) {
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || user?.fullName || profile?.fullName || user?.name || "",
+        email: prev.email || user?.email || profile?.email || "",
+        phone: prev.phone || user?.phoneNumber || profile?.phone || "",
+      }));
+    }
+  }, [isAuthenticated, user, profile]);
 
   // Intersection observers for hero and content grid
   const [heroRef, isHeroVisible] = useIntersectionObserver({
@@ -61,14 +91,78 @@ export default function SupportPage() {
     setIsAuthOpen(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setForm({ name: "", email: "", topic: "general", message: "" });
-    }, 3000);
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const isGuest = !isAuthenticated;
+      const res = await ticketService.createTicket(
+        {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          category: form.category,
+          subject: form.subject,
+          description: form.description,
+          priority: form.priority,
+          attachments: [],
+        },
+        isGuest
+      );
+
+      setTicketResult(res);
+    } catch (err) {
+      console.error("[SupportPage] Ticket error:", err);
+      setErrorMessage(
+        err?.message || "Failed to submit ticket. Please check your details and try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const handleReset = () => {
+    setTicketResult(null);
+    setErrorMessage("");
+    setForm({
+      name: isAuthenticated ? user?.fullName || profile?.fullName || "" : "",
+      email: isAuthenticated ? user?.email || profile?.email || "" : "",
+      phone: isAuthenticated ? user?.phoneNumber || profile?.phone || "" : "",
+      category: "general_support",
+      subject: "",
+      description: "",
+      priority: "medium",
+    });
+  };
+
+  const categoryOptions = [
+    {
+      value: "general_support",
+      label: "General Support",
+      icon: LifeBuoy,
+      desc: "Account, features & app feedback",
+    },
+    {
+      value: "subscriptions_payments",
+      label: "Subscriptions & Payments",
+      icon: CreditCard,
+      desc: "Plus, Gold, Platinum billing & refunds",
+    },
+    {
+      value: "safety_reporting",
+      label: "Safety & Reporting an Account",
+      icon: ShieldCheck,
+      desc: "Harassment, fake profiles & safety issues",
+    },
+    {
+      value: "selfie_verification",
+      label: "Selfie Verification Issue",
+      icon: Camera,
+      desc: "Blue badge & face scan assistance",
+    },
+  ];
 
   const faqs = [
     {
@@ -102,9 +196,8 @@ export default function SupportPage() {
         <section className="support-hero-section">
           <div
             ref={heroRef}
-            className={`support-hero-inner scroll-reveal ${
-              isHeroVisible ? "is-revealed" : ""
-            }`}
+            className={`support-hero-inner scroll-reveal ${isHeroVisible ? "is-revealed" : ""
+              }`}
           >
             <h1 className="support-hero-title">
               {t("supportPage.titlePrefix")}
@@ -123,9 +216,8 @@ export default function SupportPage() {
           <div className="container">
             <div
               ref={contentRef}
-              className={`support-grid-wrap scroll-reveal ${
-                isContentVisible ? "is-revealed" : ""
-              }`}
+              className={`support-grid-wrap scroll-reveal ${isContentVisible ? "is-revealed" : ""
+                }`}
             >
               {/* FAQ Accordion List */}
               <div className="support-faq-col">
@@ -186,72 +278,129 @@ export default function SupportPage() {
                     </p>
                   </div>
 
-                  {submitted ? (
-                    <div className="support-success-box">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                      <h4 className="font-bold text-sm text-emerald-900 dark:text-emerald-200">
-                        {t("supportPage.sentTitle")}
-                      </h4>
-                      <p className="text-xs text-emerald-700 dark:text-emerald-300">
-                        {t("supportPage.sentDesc")}
+
+                  {errorMessage && (
+                    <div className="support-alert-error">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  {ticketResult ? (
+                    <div className="support-ticket-card">
+                      <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+                      <div>
+                        <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                          {t("supportPage.sentTitle") || "Support Ticket Created Successfully!"}
+                        </h4>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                          Your Support Ticket Reference ID is:
+                        </p>
+                        <div className="support-ticket-id-pill mt-2">
+                          {ticketResult?.ticketId || "TCK-CONFIRMED"}
+                        </div>
+                      </div>
+
+                      <div className="support-ticket-meta">
+                        <div>
+                          <span className="text-zinc-400 block text-[10px] uppercase font-bold">Category</span>
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                            {categoryOptions.find((c) => c.value === (ticketResult?.category || form.category))?.label || ticketResult?.category}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 block text-[10px] uppercase font-bold">Status</span>
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400 uppercase">
+                            {ticketResult?.status || "Open"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-zinc-400 block text-[10px] uppercase font-bold">Reply Via</span>
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                            Email Update
+                          </span>
+                        </div>
+                      
+                      </div>
+
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        {ticketResult?.message || t("supportPage.sentDesc") || "Our support team will review your inquiry and reply via email shortly."}
                       </p>
+
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="support-reset-btn"
+                      >
+                        Raise Another Ticket
+                      </button>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="support-form-fields">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="support-input-label">
+                            {t("supportPage.nameLabel")} {!isAuthenticated && <span className="text-rose-500">*</span>}
+                          </label>
+                          <input
+                            type="text"
+                            required={!isAuthenticated}
+                            value={form.name}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            placeholder="e.g. Rohan Sharma"
+                            className="support-input-text"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="support-input-label">
+                            {t("supportPage.emailLabel")} {!isAuthenticated && <span className="text-rose-500">*</span>}
+                          </label>
+                          <input
+                            type="email"
+                            required={!isAuthenticated}
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            placeholder="name@example.com"
+                            className="support-input-text"
+                          />
+                        </div>
+                      </div>
+
                       <div>
                         <label className="support-input-label">
-                          {t("supportPage.nameLabel")}
+                          {t("supportPage.phoneLabel") || "Phone Number (Optional)"}
                         </label>
                         <input
-                          type="text"
-                          required
-                          value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
-                          placeholder="e.g. Rahul Sharma"
+                          type="tel"
+                          value={form.phone}
+                          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                          placeholder="+91 98765 43210"
                           className="support-input-text"
                         />
                       </div>
 
                       <div>
                         <label className="support-input-label">
-                          {t("supportPage.emailLabel")}
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          value={form.email}
-                          onChange={(e) => setForm({ ...form, email: e.target.value })}
-                          placeholder="name@example.com"
-                          className="support-input-text"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="support-input-label">
-                          {t("supportPage.categoryLabel")}
+                          {t("supportPage.categoryLabel")} <span className="text-rose-500">*</span>
                         </label>
                         <CustomSelect
-                          value={form.topic}
-                          onChange={(val) => setForm({ ...form, topic: val })}
+                          value={form.category}
+                          onChange={(val) => setForm({ ...form, category: val })}
                           size="sm"
-                          options={[
-                            { value: "general", label: "General Support", icon: LifeBuoy, desc: "Account, features & app feedback" },
-                            { value: "billing", label: "Subscriptions & Payments", icon: CreditCard, desc: "Plus, Gold, Platinum billing & refunds" },
-                            { value: "safety", label: "Safety & Reporting an Account", icon: ShieldCheck, desc: "Harassment, fake profiles & safety issues" },
-                            { value: "verification", label: "Selfie Verification Issue", icon: Camera, desc: "Blue badge & face scan assistance" },
-                          ]}
+                          options={categoryOptions}
                         />
                       </div>
 
                       <div>
                         <label className="support-input-label">
-                          {t("supportPage.msgLabel")}
+                          {t("supportPage.msgLabel") || "Description"} <span className="text-rose-500">*</span>
                         </label>
                         <textarea
                           required
                           rows={4}
-                          value={form.message}
-                          onChange={(e) => setForm({ ...form, message: e.target.value })}
+                          value={form.description}
+                          onChange={(e) => setForm({ ...form, description: e.target.value })}
                           placeholder="Describe your issue or feedback in detail..."
                           className="support-textarea"
                         />
@@ -259,9 +408,20 @@ export default function SupportPage() {
 
                       <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="support-submit-btn"
                       >
-                        {t("supportPage.submitBtn")}
+                        {isSubmitting ? (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Submitting Ticket...</span>
+                          </span>
+                        ) : (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                            <Send className="w-4 h-4" />
+                            <span>{t("supportPage.submitBtn")}</span>
+                          </span>
+                        )}
                       </button>
                     </form>
                   )}
