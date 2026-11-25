@@ -493,26 +493,18 @@ export default function SubscriptionsClient({
       <Navbar onOpenAuth={openAuth} />
 
       <main className="sub-page-main">
-        {/* Header Hero */}
-        <section
-          ref={heroRef}
-          className={`sub-hero-section sub-reveal ${isHeroVisible ? "sub-reveal-visible" : ""}`}
-        >
-          <div className="sub-hero-inner">
-            <h1 className="sub-hero-title">
-              {t("subscriptionsPage.titlePrefix") || "Level Up Your "}
-              <span className="sub-title-gradient">
-                {t("subscriptionsPage.titleHighlight") || "Connection Journey"}
-              </span>
-            </h1>
-            <p className="sub-hero-subtitle">
-              {t("subscriptionsPage.subtitle") ||
-                "Get unmatched visibility, skip the waiting queue, and connect with your dream partner faster with our premium membership plans."}
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">MEMBERSHIP</span>
+            <h1>Choose your way to connect.</h1>
+            <p>
+              Explore membership options designed to make your experience more flexible and connect faster.
             </p>
 
             {/* Active VIP Plan banner */}
             {isUserVip && (
-              <div className="sub-vip-banner">
+              <div className="sub-vip-banner" style={{ marginTop: "24px" }}>
                 <div className="sub-vip-banner-content">
                   <Crown className="sub-vip-banner-icon" />
                   <span>
@@ -530,7 +522,7 @@ export default function SubscriptionsClient({
 
             {/* Error banner if payment or action failed */}
             {errorMessage && (
-              <div className="sub-alert-banner sub-alert-error">
+              <div className="sub-alert-banner sub-alert-error" style={{ marginTop: "20px" }}>
                 <AlertCircle className="sub-alert-icon" />
                 <span>{errorMessage}</span>
               </div>
@@ -538,14 +530,14 @@ export default function SubscriptionsClient({
 
             {/* Success Status banner */}
             {statusMessage && (
-              <div className="sub-alert-banner sub-alert-success">
+              <div className="sub-alert-banner sub-alert-success" style={{ marginTop: "20px" }}>
                 <CheckCircle2 className="sub-alert-icon" />
                 <span>{statusMessage}</span>
               </div>
             )}
 
             {/* Dynamic Billing Toggle */}
-            <div className="sub-billing-wrapper">
+            <div className="sub-billing-wrapper" style={{ marginTop: "28px" }}>
               <div className="sub-billing-track">
                 {billingCycles.map((cycle) => {
                   const isActive = billingCycle === cycle.id;

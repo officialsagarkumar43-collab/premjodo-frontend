@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { AuthModal } from "@/components/common/AuthModal";
+import { DocSidebar } from "@/components/common/DocSidebar";
 import { useAuth } from "@/context/AuthContext";
 import {
   FileText,
@@ -17,7 +18,6 @@ import {
   Lock,
   Building2,
   Mail,
-  RefreshCw,
 } from "lucide-react";
 
 export default function TermsOfServicePage() {
@@ -98,26 +98,9 @@ export default function TermsOfServicePage() {
       ),
     },
     {
-      id: "cancellation-refunds",
-      icon: RefreshCw,
-      title: "4. Cancellation & Refund Policy",
-      content: (
-        <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-          <p>
-            Your satisfaction and fair billing are essential to us. Our cancellation and refund terms comply with standard payment gateway merchant operating regulations:
-          </p>
-          <ul className="list-disc list-inside space-y-1.5 pl-2">
-            <li><strong className="text-zinc-800 dark:text-zinc-200">Subscription Cancellation:</strong> You can cancel your subscription auto-renewal at any time via your in-app Profile Settings or through your Apple App Store / Google Play account. You will retain access to premium features until the end of your prepaid period.</li>
-            <li><strong className="text-zinc-800 dark:text-zinc-200">Refund Settlement Timelines:</strong> In cases of duplicate charges, technical non-delivery, or approved billing disputes, refunds will be initiated and credited back to the customer's original payment method (Bank Account, Card, UPI, or Wallet) within <strong className="text-zinc-900 dark:text-white">5 to 7 working days</strong>.</li>
-            <li><strong className="text-zinc-800 dark:text-zinc-200">Full Policy:</strong> Please review our detailed <Link href="/refund-policy" prefetch={false} className="text-rose-600 dark:text-rose-400 font-bold hover:underline">Cancellation & Refund Policy</Link> for complete dispute resolution procedures.</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
       id: "prohibited-conduct",
       icon: Ban,
-      title: "5. User Conduct & Community Guidelines",
+      title: "4. User Conduct & Community Guidelines",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -147,7 +130,7 @@ export default function TermsOfServicePage() {
     {
       id: "content-ip",
       icon: FileText,
-      title: "6. Intellectual Property & User Content License",
+      title: "5. Intellectual Property & User Content License",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -162,7 +145,7 @@ export default function TermsOfServicePage() {
     {
       id: "safety-offline",
       icon: AlertTriangle,
-      title: "7. Safety Disclaimer & Offline Meetings",
+      title: "6. Safety Disclaimer & Offline Meetings",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -177,7 +160,7 @@ export default function TermsOfServicePage() {
     {
       id: "liability-indemnity",
       icon: Scale,
-      title: "8. Limitation of Liability & Indemnification",
+      title: "7. Limitation of Liability & Indemnification",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -192,7 +175,7 @@ export default function TermsOfServicePage() {
     {
       id: "governing-law",
       icon: Scale,
-      title: "9. Governing Law & Dispute Resolution",
+      title: "8. Governing Law & Dispute Resolution",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -207,7 +190,7 @@ export default function TermsOfServicePage() {
     {
       id: "grievance-contact",
       icon: Mail,
-      title: "10. Grievance Officer & Contact Information",
+      title: "9. Grievance Officer & Contact Information",
       content: (
         <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
@@ -231,73 +214,62 @@ export default function TermsOfServicePage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="flex-1">
-        {/* Header Banner */}
-        <section className="relative py-16 sm:py-20 px-4 text-center overflow-hidden bg-gradient-to-b from-indigo-50/60 via-white to-white dark:from-zinc-900/60 dark:via-zinc-950 dark:to-zinc-950 border-b border-zinc-100 dark:border-zinc-900">
-          <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="text-3xl sm:text-5xl poppins-black tracking-tight text-zinc-900 dark:text-white">
-              Prem Jodo <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent">Terms of Service</span>
-            </h1>
-            <p className="text-sm sm:text-base poppins-regular text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              Please review these terms carefully. By using Prem Jodo, you agree to these legal obligations, billing guidelines, and community safety policies.
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">LEGAL</span>
+            <h1>Terms of service.</h1>
+            <p>
+              Please review the official terms, conditions, community rules and dispute resolution for Prem Jodo.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-500 poppins-medium pt-1">
-              <span>Last Updated: <strong className="text-zinc-700 dark:text-zinc-300">September 2026</strong></span>
-              <span>•</span>
-              <span>Platform: <strong className="text-zinc-700 dark:text-zinc-300">Prem Jodo</strong></span>
-            </div>
           </div>
         </section>
 
         {/* Navigation Quick Jump & Policy Sections */}
         <section className="py-12 sm:py-16">
-          <div className="container max-w-4xl space-y-8">
-            {/* Quick Policy Index Links */}
-            <div className="hidden sm:block p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-              <p className="text-xs poppins-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
-                Key Policy Sections
-              </p>
-              <div className="flex flex-wrap gap-2 text-xs">
-                {sections.map((sec) => (
-                  <a
-                    key={sec.id}
-                    href={`#${sec.id}`}
-                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-700 transition-colors"
-                  >
-                    {sec.title.split(". ")[1] || sec.title}
-                  </a>
-                ))}
-              </div>
-            </div>
+          <div className="container max-w-6xl">
+            <div className="doc-layout">
+              {/* Left Column: Sticky Scrollspy TOC Sidebar */}
+              <DocSidebar
+                items={sections.map((sec) => ({
+                  id: sec.id,
+                  title: sec.title,
+                  shortTitle: sec.title.split(". ")[1] || sec.title,
+                }))}
+              />
 
-            {/* Sections Content */}
-            {sections.map((sec) => {
-              const Icon = sec.icon;
-              return (
-                <div
-                  key={sec.id}
-                  id={sec.id}
-                  className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4 scroll-mt-24 transition-all"
-                >
-                  <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-                    <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20">
-                      <Icon className="w-5 h-5" />
+              {/* Right Column: Content */}
+              <div className="doc-content">
+                {sections.map((sec) => {
+                  const Icon = sec.icon;
+                  return (
+                    <div
+                      key={sec.id}
+                      id={sec.id}
+                      className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm space-y-4 scroll-mt-28 transition-all"
+                    >
+                      <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                        <div className="p-2.5 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white">
+                          {sec.title}
+                        </h2>
+                      </div>
+                      {sec.content}
                     </div>
-                    <h2 className="text-lg sm:text-xl poppins-bold text-zinc-900 dark:text-white">
-                      {sec.title}
-                    </h2>
-                  </div>
-                  {sec.content}
-                </div>
-              );
-            })}
+                  );
+                })}
 
-            {/* Compliance Quick Links Box */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs poppins-semibold">
-              <span className="text-zinc-600 dark:text-zinc-400">Related Legal & Merchant Compliance Policies:</span>
-              <div className="flex flex-wrap items-center gap-4">
-                <Link href="/privacy" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Privacy Policy →</Link>
-                <Link href="/refund-policy" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Refund Policy →</Link>
-                <Link href="/contact-us" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Contact Us →</Link>
+                {/* Compliance Quick Links Box */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
+                  <span className="text-zinc-600 dark:text-zinc-400">Related Legal & Merchant Compliance Policies:</span>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Link href="/privacy" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Privacy Policy →</Link>
+                    <Link href="/refunds" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Refund Policy →</Link>
+                    <Link href="/contact-us" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Contact Us →</Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

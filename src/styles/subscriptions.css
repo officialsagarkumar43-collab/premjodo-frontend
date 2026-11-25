@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&display=swap');
+
 /* ==========================================================================
    Prem Jodo - Subscriptions & Membership Page Dedicated Stylesheet
    File: src/styles/subscriptions.css
@@ -195,10 +197,10 @@
 
 .sub-hero-title,
 .subs-hero-title {
-  font-family: var(--font-poppins), sans-serif;
-  font-weight: 900;
-  font-size: 2.25rem;
-  letter-spacing: -0.025em;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   line-height: 1.15;
   margin: 0;
@@ -946,33 +948,35 @@
 
 .sub-card-title,
 .subs-plan-title {
-  font-family: var(--font-poppins), sans-serif;
-  font-weight: 900;
-  font-size: 1.35rem;
+  font-family: 'Playfair Display', Georgia, cursive, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.6rem;
   color: var(--text-primary);
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .sub-card-subtitle,
 .subs-plan-subtitle {
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-dm), sans-serif;
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   display: block;
-  margin-top: 0.15rem;
+  margin-top: 0.2rem;
 }
 
 .sub-card-desc,
 .subs-plan-description {
-  font-family: var(--font-poppins), sans-serif;
+  font-family: var(--font-dm), sans-serif;
   font-weight: 400;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0 0 1.5rem 0;
   min-height: 2.4rem;
 }
@@ -995,7 +999,7 @@
 
 .sub-price-cutoff,
 .subs-price-cutoff {
-  font-family: var(--font-poppins), sans-serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.35rem;
   font-weight: 700;
   color: #9ca3af;
@@ -1022,11 +1026,12 @@
 
 .sub-price-amount,
 .subs-price-currency {
-  font-family: var(--font-poppins), sans-serif;
-  font-weight: 900;
-  font-size: 2.5rem;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+  font-size: 2.75rem;
   color: var(--text-primary);
   line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 @media (min-width: 640px) {

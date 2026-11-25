@@ -3,11 +3,11 @@
 import React, { createContext, useContext, useEffect, useSyncExternalStore } from "react";
 
 const ThemeContext = createContext({
-  theme: "light",
-  resolvedTheme: "light",
+  theme: "dark",
+  resolvedTheme: "dark",
   setTheme: () => {},
   toggleTheme: () => {},
-  isDark: false,
+  isDark: true,
   mounted: false,
 });
 
@@ -29,15 +29,15 @@ const subscribeTheme = (callback) => {
 };
 
 const getThemeSnapshot = () => {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   try {
-    return localStorage.getItem(STORAGE_KEY) || "light";
+    return localStorage.getItem(STORAGE_KEY) || "dark";
   } catch {
-    return "light";
+    return "dark";
   }
 };
 
-const getServerSnapshot = () => "light";
+const getServerSnapshot = () => "dark";
 
 export function ThemeProvider({ children }) {
   const [mounted, setMounted] = React.useState(false);
@@ -52,7 +52,7 @@ export function ThemeProvider({ children }) {
     setMounted(true);
   }, []);
 
-  const [systemDark, setSystemDark] = React.useState(false);
+  const [systemDark, setSystemDark] = React.useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -65,13 +65,13 @@ export function ThemeProvider({ children }) {
     } catch {}
   }, []);
 
-  let isDark = false;
-  if (theme === "dark") {
-    isDark = true;
+  let isDark = true;
+  if (theme === "light") {
+    isDark = false;
   } else if (theme === "system") {
     isDark = systemDark;
   } else {
-    isDark = false;
+    isDark = true;
   }
 
   const resolvedTheme = isDark ? "dark" : "light";

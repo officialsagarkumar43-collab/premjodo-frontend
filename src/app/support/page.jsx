@@ -192,21 +192,13 @@ export default function SupportPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="support-page-main">
-        {/* Hero */}
-        <section className="support-hero-section">
-          <div
-            ref={heroRef}
-            className={`support-hero-inner scroll-reveal ${isHeroVisible ? "is-revealed" : ""
-              }`}
-          >
-            <h1 className="support-hero-title">
-              {t("supportPage.titlePrefix")}
-              <span className="support-title-gradient">
-                {t("supportPage.titleHighlight")}
-              </span>
-            </h1>
-            <p className="support-hero-subtitle">
-              {t("supportPage.subtitle")}
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">WE’RE HERE TO HELP</span>
+            <h1>How can we help?</h1>
+            <p>
+              Find answers to common questions or send our team a direct support message below.
             </p>
           </div>
         </section>

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
@@ -55,23 +56,35 @@ export default function DownloadPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="download-page-main">
-        {/* Hero */}
-        <section className="download-hero-section">
-          <div
-            ref={heroRef}
-            className={`download-hero-inner scroll-reveal ${
-              isHeroVisible ? "is-revealed" : ""
-            }`}
-          >
-            <h1 className="download-hero-title">
-              {t("downloadPage.titlePrefix")}
-              <span className="download-title-gradient">
-                {t("downloadPage.titleHighlight")}
-              </span>
-            </h1>
-            <p className="download-hero-subtitle">
-              {t("downloadPage.subtitle")}
-            </p>
+        {/* Redesign Download Hero Section */}
+        <section className="hero">
+          <div className="wrap split">
+            <div>
+              <div className="eyebrow">TAKE CONNECTIONS WITH YOU</div>
+              <h1>
+                Meet your next<br />
+                <em>possibility.</em>
+              </h1>
+              <p className="lead">
+                A more thoughtful dating experience, wherever life takes you. Get started with Prem Jodo.
+              </p>
+              <div className="actions">
+                <button
+                  type="button"
+                  onClick={() => openAuth("register")}
+                  className="btn"
+                >
+                  Get started
+                </button>
+                <Link href="/product" className="btn light">
+                  Explore features
+                </Link>
+              </div>
+              <p className="note" style={{ marginTop: "18px" }}>
+                Official Android &amp; iOS app listings are launching soon.
+              </p>
+            </div>
+            <div className="mock-photo" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1000&q=85')" }} />
           </div>
         </section>
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import { AuthModal } from "@/components/common/AuthModal";
+import { DocSidebar } from "@/components/common/DocSidebar";
 import { useAuth } from "@/context/AuthContext";
 import {
   ShieldCheck,
@@ -186,72 +187,62 @@ export default function PrivacyPolicyPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="flex-1">
-        {/* Header Banner */}
-        <section className="relative py-16 sm:py-20 px-4 text-center overflow-hidden bg-gradient-to-b from-rose-50/60 via-white to-white dark:from-zinc-900/60 dark:via-zinc-950 dark:to-zinc-950 border-b border-zinc-100 dark:border-zinc-900">
-          <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="text-3xl sm:text-5xl poppins-black tracking-tight text-zinc-900 dark:text-white">
-              Prem Jodo <span className="bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">Privacy Policy</span>
-            </h1>
-            <p className="text-sm sm:text-base poppins-regular text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              Your trust is our cornerstone. Learn how we protect your personal information, handle secure transactions, and safeguard your platform experience.
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">PRIVACY & TRUST</span>
+            <h1>Privacy policy.</h1>
+            <p>
+              Your trust is our cornerstone. Learn how we protect your personal information, handle secure transactions, and safeguard your experience.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-500 poppins-medium pt-1">
-              <span>Last Updated: <strong className="text-zinc-700 dark:text-zinc-300">September 2026</strong></span>
-              <span>•</span>
-              <span>Platform: <strong className="text-zinc-700 dark:text-zinc-300">Prem Jodo</strong></span>
-            </div>
           </div>
         </section>
 
         {/* Policy Content */}
         <section className="py-12 sm:py-16">
-          <div className="container max-w-4xl space-y-8">
-            {/* Quick Nav Bar */}
-            <div className="hidden sm:block p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-              <p className="text-xs poppins-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
-                Key Privacy Sections
-              </p>
-              <div className="flex flex-wrap gap-2 text-xs">
-                {sections.map((sec) => (
-                  <a
-                    key={sec.id}
-                    href={`#${sec.id}`}
-                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-700 transition-colors"
-                  >
-                    {sec.title.split(". ")[1] || sec.title}
-                  </a>
-                ))}
-              </div>
-            </div>
+          <div className="container max-w-6xl">
+            <div className="doc-layout">
+              {/* Left Column: Sticky Scrollspy TOC Sidebar */}
+              <DocSidebar
+                items={sections.map((sec) => ({
+                  id: sec.id,
+                  title: sec.title,
+                  shortTitle: sec.title.split(". ")[1] || sec.title,
+                }))}
+              />
 
-            {sections.map((sec) => {
-              const Icon = sec.icon;
-              return (
-                <div
-                  key={sec.id}
-                  id={sec.id}
-                  className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4 scroll-mt-24 transition-all"
-                >
-                  <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-                    <div className="p-2.5 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20">
-                      <Icon className="w-5 h-5" />
+              {/* Right Column: Content */}
+              <div className="doc-content">
+                {sections.map((sec) => {
+                  const Icon = sec.icon;
+                  return (
+                    <div
+                      key={sec.id}
+                      id={sec.id}
+                      className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm space-y-4 scroll-mt-28 transition-all"
+                    >
+                      <div className="flex items-center gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+                        <div className="p-2.5 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white">
+                          {sec.title}
+                        </h2>
+                      </div>
+                      {sec.content}
                     </div>
-                    <h2 className="text-lg sm:text-xl poppins-bold text-zinc-900 dark:text-white">
-                      {sec.title}
-                    </h2>
-                  </div>
-                  {sec.content}
-                </div>
-              );
-            })}
+                  );
+                })}
 
-            {/* Quick Links Box */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs poppins-semibold">
-              <span className="text-zinc-600 dark:text-zinc-400">Related Legal & Merchant Compliance Policies:</span>
-              <div className="flex flex-wrap items-center gap-4">
-                <Link href="/terms" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Terms of Service →</Link>
-                <Link href="/refund-policy" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Refund Policy →</Link>
-                <Link href="/contact-us" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Contact Us →</Link>
+                {/* Quick Links Box */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
+                  <span className="text-zinc-600 dark:text-zinc-400">Related Legal & Merchant Compliance Policies:</span>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Link href="/terms" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Terms of Service →</Link>
+                    <Link href="/refunds" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Refund Policy →</Link>
+                    <Link href="/contact-us" prefetch={false} className="text-rose-600 dark:text-rose-400 hover:underline">Contact Us →</Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -49,11 +49,9 @@ export function Navbar({ onOpenAuth }) {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   const accountMenuRef = useRef(null);
-  const servicesMenuRef = useRef(null);
   const navContainerRef = useRef(null);
   const itemRefs = useRef({});
   const [indicatorStyle, setIndicatorStyle] = useState(() => ({ ...globalNavIndicatorPos }));
@@ -79,17 +77,13 @@ export function Navbar({ onOpenAuth }) {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
         setIsAccountMenuOpen(false);
       }
-      if (servicesMenuRef.current && !servicesMenuRef.current.contains(event.target)) {
-        setIsServicesOpen(false);
-      }
     };
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsAccountMenuOpen(false);
-        setIsServicesOpen(false);
       }
     };
-    if (isAccountMenuOpen || isServicesOpen) {
+    if (isAccountMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", handleKeyDown);
     }
@@ -97,7 +91,7 @@ export function Navbar({ onOpenAuth }) {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isAccountMenuOpen, isServicesOpen]);
+  }, [isAccountMenuOpen]);
 
   // Prevent background scrolling when mobile sidebar is open
   useEffect(() => {
@@ -216,52 +210,22 @@ export function Navbar({ onOpenAuth }) {
     return normCurrent === normHref || normCurrent.startsWith(normHref + "/");
   }, [pathname]);
 
-  const isServicesActive = useMemo(() => {
-    return (
-      pathname?.startsWith("/ecommerce") ||
-      pathname?.startsWith("/ecommerce-services") ||
-      pathname?.startsWith("/movies") ||
-      pathname?.startsWith("/movie-booking")
-    );
-  }, [pathname]);
-
-  const servicesSubItems = useMemo(() => [
-    {
-      key: "ecommerce",
-      href: "/ecommerce",
-      label: t("nav.ecommerce") || "Ecommerce Services",
-      icon: ShoppingBag,
-    },
-    {
-      key: "movies",
-      href: "/movies",
-      label: t("nav.movies") || "Movie Booking",
-      icon: Film,
-    },
+  const navItems = useMemo(() => [
+    { key: "home", href: "/", label: t("nav.home", "Home"), icon: Sparkles },
+    { key: "product", href: "/product", label: t("nav.howItWorks", "How it works"), icon: Sparkles },
+    { key: "safety", href: "/safety", label: t("nav.safety", "Safety"), icon: ShieldCheck },
+    { key: "subscriptions", href: "/subscriptions", label: t("nav.membership", "Membership"), icon: CreditCard },
+    { key: "support", href: "/support", label: t("nav.support", "Support"), icon: HelpCircle },
+    { key: "download", href: "/download", label: t("nav.download", "Download"), icon: Download },
   ], [t]);
 
-  const navItems = useMemo(() => [
-    { key: "product", href: "/product", label: t("nav.product") || "Product", icon: Sparkles },
-    {
-      key: "services",
-      label: t("nav.services") || "Services",
-      isDropdown: true,
-      subItems: servicesSubItems,
-    },
-    { key: "safety", href: "/safety", label: t("nav.safety") || "Safety", icon: ShieldCheck },
-    { key: "support", href: "/support", label: t("nav.support") || "Support", icon: HelpCircle },
-    { key: "subscriptions", href: "/subscriptions", label: t("nav.subscriptions") || "Subscriptions", icon: CreditCard },
-    { key: "download", href: "/download", label: t("nav.download") || "Download", icon: Download },
-  ], [t, servicesSubItems]);
-
   const mobileNavItems = useMemo(() => [
-    { key: "product", href: "/product", label: t("nav.product") || "Product", icon: Sparkles },
-    { key: "ecommerce", href: "/ecommerce", label: t("nav.ecommerce") || "Ecommerce Services", icon: ShoppingBag, isSoon: true },
-    { key: "movies", href: "/movies", label: t("nav.movies") || "Movie Booking", icon: Film, isSoon: true },
-    { key: "safety", href: "/safety", label: t("nav.safety") || "Safety", icon: ShieldCheck },
-    { key: "support", href: "/support", label: t("nav.support") || "Support", icon: HelpCircle },
-    { key: "subscriptions", href: "/subscriptions", label: t("nav.subscriptions") || "Subscriptions", icon: CreditCard },
-    { key: "download", href: "/download", label: t("nav.download") || "Download", icon: Download },
+    { key: "home", href: "/", label: t("nav.home", "Home"), icon: Sparkles },
+    { key: "product", href: "/product", label: t("nav.howItWorks", "How it works"), icon: Sparkles },
+    { key: "safety", href: "/safety", label: t("nav.safety", "Safety"), icon: ShieldCheck },
+    { key: "subscriptions", href: "/subscriptions", label: t("nav.membership", "Membership"), icon: CreditCard },
+    { key: "support", href: "/support", label: t("nav.support", "Support"), icon: HelpCircle },
+    { key: "download", href: "/download", label: t("nav.download", "Download"), icon: Download },
   ], [t]);
 
   // Non-blocking indicator updater using requestAnimationFrame to prevent forced reflows during page switch
@@ -269,13 +233,8 @@ export function Navbar({ onOpenAuth }) {
     if (typeof window === "undefined") return;
 
     window.requestAnimationFrame(() => {
-      let activeKey = null;
-      if (isServicesActive) {
-        activeKey = "services";
-      } else {
-        const activeItem = navItems.find((item) => !item.isDropdown && isPathActive(item.href));
-        if (activeItem) activeKey = activeItem.key;
-      }
+      const activeItem = navItems.find((item) => isPathActive(item.href));
+      const activeKey = activeItem ? activeItem.key : null;
 
       const el = activeKey ? itemRefs.current[activeKey] : null;
       const navEl = navContainerRef.current;
@@ -297,7 +256,7 @@ export function Navbar({ onOpenAuth }) {
         setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }));
       }
     });
-  }, [navItems, isServicesActive, isPathActive]);
+  }, [navItems, isPathActive]);
 
   useEffect(() => {
     updateIndicator();
@@ -319,56 +278,6 @@ export function Navbar({ onOpenAuth }) {
           {/* Desktop Center Navigation Links */}
           <nav ref={navContainerRef} className="header-nav">
             {navItems.map((item) => {
-              if (item.isDropdown) {
-                return (
-                  <div
-                    key={item.key}
-                    ref={(el) => {
-                      if (el) itemRefs.current[item.key] = el;
-                    }}
-                    className="nav-dropdown-wrapper"
-                    onMouseEnter={() => setIsServicesOpen(true)}
-                    onMouseLeave={() => setIsServicesOpen(false)}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setIsServicesOpen((prev) => !prev)}
-                      className={`nav-dropdown-btn ${isServicesActive ? "active" : ""}`}
-                    >
-                      <span>{item.label}</span>
-                      <ChevronDown className={`nav-dropdown-chevron ${isServicesOpen ? "open" : ""}`} />
-                      <span className="nav-link-indicator-fallback" />
-                    </button>
-
-                    {/* Services Dropdown Menu */}
-                    {isServicesOpen && (
-                      <div ref={servicesMenuRef} className="services-dropdown-panel">
-                        {item.subItems.map((sub) => {
-                          const SubIcon = sub.icon;
-                          const isSubActive = isPathActive(sub.href);
-                          return (
-                            <Link
-                              key={sub.key}
-                              href={sub.href}
-                              onClick={() => setIsServicesOpen(false)}
-                              className={`services-dropdown-link ${isSubActive ? "active" : ""}`}
-                            >
-                              <div className="services-icon-box">
-                                <SubIcon style={{ width: "1rem", height: "1rem" }} />
-                              </div>
-                              <div className="services-item-title">
-                                <span>{sub.label}</span>
-                                <span className="badge-soon">Soon</span>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-
               const isActive = isPathActive(item.href);
 
               return (
@@ -380,7 +289,7 @@ export function Navbar({ onOpenAuth }) {
                   href={item.href}
                   className={`nav-link ${isActive ? "active" : ""}`}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
                   <span className="nav-link-indicator-fallback" />
                 </Link>
               );
@@ -539,9 +448,9 @@ export function Navbar({ onOpenAuth }) {
                 )}
               </div>
             ) : (
-              /* Desktop Log in Button */
-              <button onClick={handleOpenLogin} className="btn-header-login">
-                {t("nav.login")}
+              /* Desktop Join Prem Jodo Button */
+              <button onClick={handleOpenLogin} className="btn btn-header-login">
+                {t("nav.joinPremJodo", "Join Prem Jodo")}
               </button>
             )}
 
@@ -677,96 +586,6 @@ export function Navbar({ onOpenAuth }) {
                 </Link>
               );
             })}
-          </div>
-
-          {/* Drawer Footer Actions */}
-          <div className="mobile-drawer-footer">
-            <div className="mobile-quick-grid">
-              {isAuthenticated ? (
-                <Link
-                  href="/user/profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="mobile-quick-btn"
-                  title="My Account"
-                >
-                  <div className="mobile-quick-icon">
-                    <User style={{ width: "1rem", height: "1rem" }} />
-                  </div>
-                  <span className="mobile-quick-label">Account</span>
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleOpenLogin}
-                  className="mobile-quick-btn"
-                  title="Log In"
-                >
-                  <div className="mobile-quick-icon">
-                    <User style={{ width: "1rem", height: "1rem" }} />
-                  </div>
-                  <span className="mobile-quick-label">Login</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setIsLangOpen(true)}
-                className="mobile-quick-btn"
-                title="Change Language"
-              >
-                <div className="mobile-quick-icon" style={{ backgroundColor: "rgba(99, 102, 241, 0.1)", color: "#6366f1" }}>
-                  <LanguageIcon code={language} symbol={currentLangObj?.symbol} size="sm" />
-                </div>
-                <span className="mobile-quick-label">{t("nav.language", "Language")}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="mobile-quick-btn"
-                title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} mode`}
-              >
-                <div className="mobile-quick-icon" style={{ backgroundColor: "rgba(245, 158, 11, 0.1)", color: "#f59e0b" }}>
-                  {resolvedTheme === "dark" ? (
-                    <Sun style={{ width: "1rem", height: "1rem" }} />
-                  ) : (
-                    <Moon style={{ width: "1rem", height: "1rem" }} />
-                  )}
-                </div>
-                <span className="mobile-quick-label">
-                  {resolvedTheme === "dark" ? "Light" : "Dark"}
-                </span>
-              </button>
-
-              {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setIsMobileMenuOpen(false);
-                    await logout();
-                  }}
-                  className="mobile-quick-btn"
-                  title="Log Out"
-                >
-                  <div className="mobile-quick-icon">
-                    <LogOut style={{ width: "1rem", height: "1rem" }} />
-                  </div>
-                  <span className="mobile-quick-label">Logout</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleOpenLogin}
-                  className="mobile-quick-btn login-btn"
-                  title="Sign In"
-                >
-                  <div className="mobile-quick-icon">
-                    <LogOut style={{ width: "1rem", height: "1rem", transform: "rotate(180deg)" }} />
-                  </div>
-                  <span className="mobile-quick-label">Sign In</span>
-                </button>
-              )}
-            </div>
           </div>
         </aside>
       </div>

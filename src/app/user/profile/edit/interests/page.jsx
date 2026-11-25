@@ -204,7 +204,7 @@ export default function EditInterestsPage() {
 
           {/* Search & Custom Add Bar */}
           <div className="space-y-3">
-            <div className="relative">
+            {/* <div className="relative">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
@@ -213,10 +213,10 @@ export default function EditInterestsPage() {
                 placeholder="Search interests (e.g. Hiking, Anime, Cricket)..."
                 className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-rose-500"
               />
-            </div>
+            </div> */}
 
             {/* Custom tag add form */}
-            <form onSubmit={handleAddCustomTag} className="flex gap-2">
+            {/* <form onSubmit={handleAddCustomTag} className="flex gap-2">
               <input
                 type="text"
                 value={customTagInput}
@@ -231,7 +231,7 @@ export default function EditInterestsPage() {
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add</span>
               </button>
-            </form>
+            </form> */}
           </div>
 
           {/* Available Interest Tags Cloud */}
@@ -250,11 +250,10 @@ export default function EditInterestsPage() {
                     key={tag}
                     type="button"
                     onClick={() => toggleInterest(tag)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 ${
-                      isSelected
-                        ? "bg-rose-500 text-white shadow-sm shadow-rose-500/25"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-transparent hover:border-zinc-300"
-                    }`}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-150 flex items-center gap-1.5 ${isSelected
+                      ? "bg-rose-500 text-white shadow-sm shadow-rose-500/25"
+                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-transparent hover:border-zinc-300"
+                      }`}
                   >
                     {isSelected && <Check className="w-3.5 h-3.5" />}
                     <span>{tag}</span>

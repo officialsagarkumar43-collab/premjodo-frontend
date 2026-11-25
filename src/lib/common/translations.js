@@ -23,17 +23,21 @@ export const translations = {
   // English (Base Source of Truth)
   en: {
     nav: {
-      product: "Product",
+      home: "Home",
+      howItWorks: "How it works",
+      product: "How it works",
       services: "Services",
       ecommerce: "Ecommerce Services",
       movies: "Movie Booking",
-      subscriptions: "Subscriptions",
+      subscriptions: "Membership",
+      membership: "Membership",
       safety: "Safety",
       support: "Support",
       download: "Download",
       events: "Events",
       language: "Language",
       login: "Log in",
+      joinPremJodo: "Join Prem Jodo",
       comingSoon: "Coming Soon",
     },
     hero: {

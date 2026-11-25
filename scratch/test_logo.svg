@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100">
+  <defs>
+    <!-- Left Loop Theme Gradient (Rose / Wine) -->
+    <linearGradient id="left-loop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#be123c" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+
+    <!-- Right Loop Theme Gradient (Pink / Rose-Coral) -->
+    <linearGradient id="right-loop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#fb7185" />
+    </linearGradient>
+
+    <!-- Center Circle Gradient -->
+    <linearGradient id="center-circle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Loop -->
+  <path
+    d="M 100 50 C 72 16, 24 16, 24 50 C 24 84, 72 84, 100 50"
+    fill="none"
+    stroke="url(#left-loop)"
+    stroke-width="15"
+    stroke-linecap="round"
+  />
+
+  <!-- Right Loop -->
+  <path
+    d="M 100 50 C 128 16, 176 16, 176 50 C 176 84, 128 84, 100 50"
+    fill="none"
+    stroke="url(#right-loop)"
+    stroke-width="15"
+    stroke-linecap="round"
+  />
+
+  <!-- Center Circle Medallion -->
+  <circle cx="100" cy="50" r="23" fill="url(#center-circle)" />
+
+  <!-- Crisp White Heart -->
+  <path
+    d="M 100 61 C 98.2 59.2, 89 50.8, 89 44 C 89 38.8, 93 35, 97.5 35 C 99.2 35, 100 36.2, 100 36.2 C 100 36.2, 100.8 35, 102.5 35 C 107 35, 111 38.8, 111 44 C 111 50.8, 101.8 59.2, 100 61 Z"
+    fill="#ffffff"
+  />
+</svg>

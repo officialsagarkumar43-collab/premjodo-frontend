@@ -17,10 +17,12 @@ export default function GlobalBackground() {
   const pathname = usePathname();
   const { isDark, mounted } = useTheme();
 
-  // Exclude chat & direct messaging routes
+  // Exclude chat & direct messaging routes (including guest random chat)
   const isChatRoute =
     pathname?.startsWith("/user/matches") ||
-    pathname?.startsWith("/user/chat");
+    pathname?.startsWith("/user/chat") ||
+    pathname?.startsWith("/text-chat") ||
+    pathname?.startsWith("/guest-chat");
 
   // Disable in white/light mode or on chat routes
   if (isChatRoute || !isDark) {

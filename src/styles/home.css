@@ -163,7 +163,73 @@
 }
 
 /* --------------------------------------------------------------------------
-   Hero Section
+   Redesign Preview Editorial Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  background: linear-gradient(110deg, #fff8f3 0%, #fff3f3 58%, #f6e3e8 100%);
+  padding: 76px 0 70px;
+  overflow: hidden;
+  position: relative;
+}
+
+:root.dark .hero,
+.dark .hero {
+  background: linear-gradient(110deg, #181116 0%, #20131b 58%, #291520 100%);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 1280px) {
+  .hero-grid {
+    gap: 64px;
+  }
+}
+
+.hero h1 {
+  font: 700 clamp(44px, 5vw, 68px) / 1.05 'Playfair Display', Georgia, serif;
+  letter-spacing: -1.8px;
+  margin: 18px 0;
+  color: var(--ink, #241a20);
+}
+
+:root.dark .hero h1,
+.dark .hero h1 {
+  color: #fdf8fa;
+}
+
+.hero h1 em {
+  color: var(--wine, #7d183b);
+  font-style: normal;
+}
+
+:root.dark .hero h1 em,
+.dark .hero h1 em {
+  color: #f472b6;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin: 28px 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 800px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    padding: 55px 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Hero Section (Legacy Support)
    -------------------------------------------------------------------------- */
 .hero-section {
   position: relative;
@@ -241,6 +307,75 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   Hero Trust Badge Pill (Top Pill)
+   -------------------------------------------------------------------------- */
+.hero-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  margin-bottom: 1.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(225, 29, 72, 0.2);
+  box-shadow: 0 4px 16px -2px rgba(225, 29, 72, 0.12);
+  animation: heroTrustBadgeFade 0.6s ease-out forwards;
+}
+
+:root.dark .hero-trust-badge,
+.dark .hero-trust-badge {
+  background: rgba(24, 24, 27, 0.75);
+  border-color: rgba(244, 63, 94, 0.3);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+.hero-trust-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: tmPulse 2s ease-in-out infinite;
+}
+
+.hero-trust-text {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #18181b);
+}
+
+:root.dark .hero-trust-text,
+.dark .hero-trust-text {
+  color: var(--text-primary, #f4f4f5);
+}
+
+.hero-trust-highlight {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #e11d48, #ec4899);
+  color: #ffffff;
+}
+
+@keyframes heroTrustBadgeFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Main Hero Typography */
@@ -463,6 +598,70 @@
   .hero-btn-arrow {
     width: 1.1rem;
     height: 1.1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Trust Proof Bar (Below CTA Buttons)
+   -------------------------------------------------------------------------- */
+.hero-trust-proof-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.25rem;
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(228, 228, 231, 0.6);
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-zinc-600, #52525b);
+}
+
+:root.dark .hero-trust-proof-bar,
+.dark .hero-trust-proof-bar {
+  background: rgba(24, 24, 27, 0.45);
+  border-color: rgba(39, 39, 42, 0.7);
+  color: var(--color-zinc-300, #d4d4d8);
+}
+
+.hero-trust-proof-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.hero-trust-proof-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+.hero-trust-proof-icon-emerald {
+  color: #10b981;
+}
+
+.hero-trust-proof-icon-rose {
+  color: #f43f5e;
+}
+
+.hero-trust-proof-icon-amber {
+  color: #f59e0b;
+}
+
+.hero-trust-proof-separator {
+  color: var(--color-zinc-400, #a1a1aa);
+  user-select: none;
+}
+
+@media (max-width: 639px) {
+  .hero-trust-proof-separator {
+    display: none;
   }
 }
 

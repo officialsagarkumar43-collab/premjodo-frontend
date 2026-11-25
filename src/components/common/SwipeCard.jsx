@@ -322,11 +322,10 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
       {/* Top Active Interactive Swipe Card */}
       <div
         onPointerDown={handlePointerDown}
-        className={`absolute inset-0.5 sm:inset-1 rounded-3xl overflow-hidden shadow-2xl bg-zinc-950 border border-zinc-800/80 cursor-grab active:cursor-grabbing select-none ${
-          isDragging
+        className={`absolute inset-0.5 sm:inset-1 rounded-3xl overflow-hidden shadow-2xl bg-zinc-950 border border-zinc-800/80 cursor-grab active:cursor-grabbing select-none ${isDragging
             ? "transition-none"
             : "transition-all duration-250 cubic-bezier(0.25, 1, 0.5, 1)"
-        }`}
+          }`}
         style={{
           transform: `translate3d(${translateX}px, ${translateY}px, 0) rotate(${rotation}deg) scale(${scale})`,
           opacity: opacity,
@@ -382,7 +381,7 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
           </div>
 
           {/* Filter / Sliders Button */}
-          <button
+          {/* <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
@@ -392,7 +391,7 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
             title="Discovery Filters"
           >
             <SlidersHorizontal className="w-4.5 h-4.5 text-white" />
-          </button>
+          </button> */}
         </div>
 
         {/* ============================================================ */}
@@ -495,17 +494,16 @@ export function SwipeCard({ profiles = [], onSwipe, onReset, onRewind, onOpenFil
               handleRewind();
             }}
             disabled={!!swipeDirection}
-            className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all shadow-lg cursor-pointer group ${
-              currentIndex > 0
+            className={`w-12 h-12 rounded-full backdrop-blur-md flex items-center justify-center transition-all shadow-lg cursor-pointer group ${currentIndex > 0
                 ? "bg-amber-500/20 hover:bg-amber-500/30 border-2 border-amber-400 text-amber-400 hover:scale-105 active:scale-90 shadow-amber-500/20"
                 : "bg-[#12131a]/90 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-400 hover:text-zinc-200"
-            }`}
+              }`}
             title={
               currentIndex > 0
                 ? "Rewind / Undo Last Swipe"
                 : canRewindUnlimited
-                ? "Unlimited Rewinds Active (Swipe a card first to undo)"
-                : "Rewind (Swipe a card first)"
+                  ? "Unlimited Rewinds Active (Swipe a card first to undo)"
+                  : "Rewind (Swipe a card first)"
             }
           >
             <RotateCcw className={`w-5 h-5 transition-transform duration-200 ${currentIndex > 0 ? "group-hover:-rotate-45 text-amber-400" : "group-hover:-rotate-45 text-zinc-400"}`} />

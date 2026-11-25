@@ -6,7 +6,6 @@ import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { GlobalCallListener } from "@/components/chat/GlobalCallListener";
 import { ConsoleSilencer } from "@/components/common/ConsoleSilencer";
 import GlobalBackground from "@/components/common/GlobalBackground";
-import AnimatedCursor from "@/components/common/AnimatedCursor";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -166,12 +165,14 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${poppins.variable} ${robotoSlab.variable} ${plusJakarta.variable} ${outfit.variable} antialiased`}
+      className={`dark ${poppins.variable} ${robotoSlab.variable} ${plusJakarta.variable} ${outfit.variable} antialiased`}
+      data-theme="dark"
+      style={{ colorScheme: "dark" }}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("prem_jodo_theme");var d=window.matchMedia("(prefers-color-scheme: dark)").matches;var isDark=t==="dark"||(t==="system"&&d);if(isDark){document.documentElement.classList.add("dark");document.documentElement.setAttribute("data-theme","dark");document.documentElement.style.colorScheme="dark";}else{document.documentElement.classList.remove("dark");document.documentElement.setAttribute("data-theme","light");document.documentElement.style.colorScheme="light";}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("prem_jodo_theme")||"dark";var d=window.matchMedia("(prefers-color-scheme: dark)").matches;var isDark=t==="dark"||(t==="system"&&d)||(t!=="light");if(isDark){document.documentElement.classList.add("dark");document.documentElement.setAttribute("data-theme","dark");document.documentElement.style.colorScheme="dark";}else{document.documentElement.classList.remove("dark");document.documentElement.setAttribute("data-theme","light");document.documentElement.style.colorScheme="light";}}catch(e){}})();`,
           }}
         />
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -193,7 +194,6 @@ export default function RootLayout({ children }) {
             <AuthProvider>
               <ConsoleSilencer />
               <GlobalBackground />
-              <AnimatedCursor />
               {children}
               <MobileBottomNav />
               <GlobalCallListener />

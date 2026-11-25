@@ -79,7 +79,11 @@ export function MobileBottomNav() {
   const isMessagesActive = pathname?.startsWith("/user/matches");
   const isProfileActive = pathname?.startsWith("/user/profile");
 
-  if (isBattleGame) {
+  const isChatRoute =
+    pathname?.startsWith("/text-chat") ||
+    pathname?.startsWith("/guest-chat");
+
+  if (isBattleGame || isChatRoute) {
     return null;
   }
 

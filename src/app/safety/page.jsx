@@ -88,109 +88,78 @@ export default function SafetyPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="safety-page-main">
-        {/* Hero */}
-        <section className="safety-hero-section">
-          <div
-            ref={heroRef}
-            className={`safety-hero-inner scroll-reveal ${
-              isHeroVisible ? "is-revealed" : ""
-            }`}
-          >
-            <h1 className="safety-hero-title">
-              {t("safetyPage.titlePrefix")}
-              <span className="safety-title-gradient">
-                {t("safetyPage.titleHighlight")}
-              </span>
-            </h1>
-            <p className="safety-hero-subtitle">
-              {t("safetyPage.subtitle")}
+        {/* Pagehead */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">SAFETY & PRIVACY</span>
+            <h1>Date with confidence.</h1>
+            <p>
+              Your comfort matters. Explore the controls designed to help you shape a safer, more private experience.
             </p>
           </div>
         </section>
 
-        {/* 4 Pillars of Safety */}
-        <section className="safety-pillars-section">
-          <div className="container">
-            <div className="safety-pillars-header">
-              <h2 className="safety-section-heading">
-                {t("safetyPage.headingProtect")}
-              </h2>
-            </div>
+        {/* 6 Safety & Privacy Cards */}
+        <section className="section">
+          <div className="wrap">
+            <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+              <article className="card">
+                <div className="icon">✓</div>
+                <h3>Selfie verification</h3>
+                <p>Verification features can help members build confidence that profiles represent real people.</p>
+              </article>
 
-            <div
-              ref={pillarsRef}
-              className={`safety-pillars-grid scroll-reveal ${
-                isPillarsVisible ? "is-revealed" : ""
-              }`}
-            >
-              {safetyPillars.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <article key={idx} className="safety-pillar-card">
-                    <div className="safety-pillar-icon-box">
-                      <Icon className="w-7 h-7" />
-                    </div>
-                    <div className="safety-pillar-content">
-                      <h3 className="safety-pillar-title">{item.title}</h3>
-                      <p className="safety-pillar-desc">{item.desc}</p>
-                    </div>
-                  </article>
-                );
-              })}
+              <article className="card">
+                <div className="icon">◉</div>
+                <h3>Ghost Mode</h3>
+                <p>Browse with greater discretion and choose when your profile is visible.</p>
+              </article>
+
+              <article className="card">
+                <div className="icon">⊘</div>
+                <h3>Block & report</h3>
+                <p>Use quick controls to block or report behaviour that makes you uncomfortable.</p>
+              </article>
+
+              <article className="card">
+                <div className="icon">⌑</div>
+                <h3>Selective visibility</h3>
+                <p>Keep control over how your profile is presented and who can discover you.</p>
+              </article>
+
+              <article className="card">
+                <div className="icon">♢</div>
+                <h3>Clear intentions</h3>
+                <p>Set expectations early to connect with people on a similar wavelength.</p>
+              </article>
+
+              <article className="card">
+                <div className="icon">🔒</div>
+                <h3>Privacy protection</h3>
+                <p>Your contact details and sensitive information stay protected by design.</p>
+              </article>
             </div>
           </div>
         </section>
 
-        {/* Real-World Meetup Safety Rules */}
-        <section className="safety-rules-section">
-          <div className="container">
-            <div className="safety-rules-header">
-              <h2 className="safety-section-heading">
-                {t("safetyPage.rulesHeading")}
-              </h2>
-              <p className="safety-rules-subtitle">
-                {t("safetyPage.rulesSub")}
+        {/* Safety Guidelines Band */}
+        <section className="band">
+          <div className="wrap split">
+            <div>
+              <div className="eyebrow" style={{ color: "#f3b9ca" }}>Real-World Safety</div>
+              <h2>Meet safely in public spaces.</h2>
+              <p>
+                Always arrange initial dates in well-lit public spots, arrange your own transportation, and inform a friend or family member.
               </p>
+              <button
+                type="button"
+                onClick={() => openAuth("register")}
+                className="btn"
+              >
+                Join Safe Community
+              </button>
             </div>
-
-            <div
-              ref={rulesRef}
-              className={`safety-rules-grid scroll-reveal ${
-                isRulesVisible ? "is-revealed" : ""
-              }`}
-            >
-              <div className="safety-rule-card">
-                <div className="safety-rule-title-box color-rose">
-                  <HeartHandshake className="w-5 h-5" />
-                  <span>{t("safetyPage.r1_title")}</span>
-                </div>
-                <p className="safety-rule-desc">{t("safetyPage.r1_desc")}</p>
-              </div>
-
-              <div className="safety-rule-card">
-                <div className="safety-rule-title-box color-amber">
-                  <AlertTriangle className="w-5 h-5" />
-                  <span>{t("safetyPage.r2_title")}</span>
-                </div>
-                <p className="safety-rule-desc">{t("safetyPage.r2_desc")}</p>
-              </div>
-
-              <div className="safety-rule-card">
-                <div className="safety-rule-title-box color-rose">
-                  <UserCheck className="w-5 h-5" />
-                  <span>{t("safetyPage.r3_title")}</span>
-                </div>
-                <p className="safety-rule-desc">{t("safetyPage.r3_desc")}</p>
-              </div>
-
-              <div className="safety-rule-card">
-                <div className="safety-rule-title-box color-purple">
-                  <PhoneCall className="w-5 h-5" />
-                  <span>{t("safetyPage.r4_title")}</span>
-                </div>
-                <p className="safety-rule-desc">{t("safetyPage.r4_desc")}</p>
-              </div>
-            </div>
+            <div className="mock-photo" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522543558187-768b6df7c25c?auto=format&fit=crop&w=1000&q=85')" }} />
           </div>
         </section>
       </main>

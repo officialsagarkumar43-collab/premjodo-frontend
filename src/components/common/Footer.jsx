@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { FooterWordmark } from "./FooterWordmark";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguageModal } from "./LanguageModal";
 import { LanguageIcon } from "./LanguageIcon";
@@ -22,116 +23,96 @@ export function Footer() {
   return (
     <>
       <footer className="site-footer">
-        <div className="footer-container">
-          <div className="footer-grid">
+        <div className="wrap">
+          <div className="footgrid">
             {/* Brand Info */}
-            <div className="footer-col-brand">
-              <Logo size="sm" />
-              <p className="footer-tagline">
-                {t("footer.tagline") ||
-                  "Prem Jodo — Connecting verified individuals with trust, transparency, and respect."}
+            <div>
+              <div style={{ marginBottom: "14px" }}>
+                <Logo size="sm" variant="dark" />
+              </div>
+              <p style={{ color: "#ffffff", opacity: 0.92, fontSize: "14px", lineHeight: "1.7", maxWidth: "340px", margin: 0 }}>
+                {t("footer.tagline", "Make room for meaningful connections. Meet people with intention, confidence and care.")}
               </p>
             </div>
 
-            {/* Quick Links */}
-            <div className="footer-col footer-col-platform">
-              <h4 className="footer-heading">Platform</h4>
-              <div className="footer-links-list">
-                <Link href="/user" className="footer-link">
-                  {t("footer.discover") || "Discover Singles"}
-                </Link>
-                <Link href="/user/matches" className="footer-link">
-                  {t("footer.matches") || "Matches & Chats"}
-                </Link>
-                <Link href="/subscriptions" className="footer-link">
-                  {t("footer.subscriptions") || "VIP Subscriptions"}
-                </Link>
-                <Link href="/safety-tips" className="footer-link">
-                  {t("footer.safetyTips") || "Safety Tips & Rules"}
-                </Link>
-              </div>
+            {/* Explore */}
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "15px", fontWeight: "700", marginTop: 0, marginBottom: "14px" }}>
+                Explore
+              </h4>
+              <Link href="/product" className="foot-link">
+                {t("nav.howItWorks", "How it works")}
+              </Link>
+              <Link href="/subscriptions" className="foot-link">
+                {t("nav.membership", "Membership")}
+              </Link>
+              <Link href="/download" className="foot-link">
+                {t("nav.download", "Get the app")}
+              </Link>
             </div>
 
-            {/* Legal & Compliance */}
-            <div className="footer-col footer-col-legal">
-              <h4 className="footer-heading">Legal & Policies</h4>
-              <div className="footer-links-list">
-                <Link href="/terms" className="footer-link">
-                  {t("footer.terms") || "Terms & Conditions"}
-                </Link>
-                <Link href="/privacy" className="footer-link">
-                  {t("footer.privacy") || "Privacy Policy"}
-                </Link>
-                <Link href="/refund-policy" className="footer-link">
-                  {t("footer.refundPolicy") || "Cancellation & Refund Policy"}
-                </Link>
-                <Link href="/contact-us" className="footer-link">
-                  {t("footer.contactUs") || "Contact Us"}
-                </Link>
-              </div>
+            {/* Your Safety */}
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "15px", fontWeight: "700", marginTop: 0, marginBottom: "14px" }}>
+                Your safety
+              </h4>
+              <Link href="/safety" className="foot-link">
+                {t("nav.safety", "Safety centre")}
+              </Link>
+              <Link href="/support" className="foot-link">
+                {t("nav.support", "Help & support")}
+              </Link>
+              <Link href="/privacy" className="foot-link">
+                Privacy
+              </Link>
             </div>
 
-            {/* Customer Care / Support */}
-            <div className="footer-col footer-col-support">
-              <h4 className="footer-heading">Support</h4>
-              <div className="footer-links-list">
-                <Link href="/support" className="footer-link">
-                  {t("footer.support") || "Help Center & FAQs"}
-                </Link>
-                <Link href="/contact-us" className="footer-link">
-                  Grievance Officer
-                </Link>
-                <span className="footer-support-time">
-                  Mon - Sat: 9 AM - 7 PM IST
-                </span>
-              </div>
+            {/* Company */}
+            <div>
+              <h4 style={{ color: "#ffffff", fontSize: "15px", fontWeight: "700", marginTop: 0, marginBottom: "14px" }}>
+                Company
+              </h4>
+              <Link href="/about" className="foot-link">
+                About us
+              </Link>
+              <Link href="/contact-us" className="foot-link">
+                Contact
+              </Link>
+              <Link href="/terms" className="foot-link">
+                Terms
+              </Link>
+              <Link href="/refunds" className="foot-link">
+                Refunds policy
+              </Link>
             </div>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="footer-bottom">
-            <p className="footer-copyright">
-              {t("footer.copyright") || "Prem Jodo Official Platform ©"}{" "}
-              {new Date().getFullYear()} Prem Jodo. All rights reserved.
-            </p>
-            <div className="footer-bottom-actions">
-              <button
-                type="button"
-                onClick={() => setIsLangOpen(true)}
-                className="footer-lang-btn"
-                title="Change Language"
-              >
-                <LanguageIcon
-                  code={language}
-                  symbol={currentLangObj?.symbol}
-                  size="xs"
-                  className="footer-lang-icon"
-                />
-                <span>
-                  {currentLangObj?.nativeName || currentLangObj?.name || "English"}
-                </span>
-              </button>
-
-              <div className="footer-bottom-links">
-                <Link href="/terms" className="footer-bottom-link">
-                  Terms
-                </Link>
-                <span className="footer-dot">•</span>
-                <Link href="/privacy" className="footer-bottom-link">
-                  Privacy
-                </Link>
-                <span className="footer-dot">•</span>
-                <Link href="/refund-policy" className="footer-bottom-link">
-                  Refunds
-                </Link>
-                <span className="footer-dot">•</span>
-                <Link href="/contact-us" className="footer-bottom-link">
-                  Contact
-                </Link>
-              </div>
+          {/* Bottom Copyright & Language Row */}
+          <div className="copyright-row">
+            <div className="copyright">
+              © {new Date().getFullYear()} Prem Jodo. All rights reserved.
             </div>
+
+            <button
+              type="button"
+              onClick={() => setIsLangOpen(true)}
+              className="footer-lang-btn-preview"
+              title="Change Language"
+            >
+              <LanguageIcon
+                code={language}
+                symbol={currentLangObj?.symbol}
+                size="xs"
+              />
+              <span>
+                {currentLangObj?.nativeName || currentLangObj?.name || "English"}
+              </span>
+            </button>
           </div>
         </div>
+
+        {/* Tinder-style Giant All-Caps SVG Wordmark Banner (Individual Vector Paths) */}
+        <FooterWordmark />
       </footer>
 
       <LanguageModal

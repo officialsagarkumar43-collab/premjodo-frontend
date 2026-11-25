@@ -205,11 +205,10 @@ export default function EditLifestylePage() {
                 if (errors.aboutMe) setErrors((prev) => ({ ...prev, aboutMe: null }));
               }}
               placeholder="Write a catchy, authentic introduction about yourself..."
-              className={`w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 transition-all resize-none ${
-                errors.aboutMe
+              className={`w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 transition-all resize-none ${errors.aboutMe
                   ? "border-rose-500 focus:ring-rose-500/20"
                   : "border-zinc-200 dark:border-zinc-700 focus:border-rose-500 focus:ring-rose-500/10"
-              }`}
+                }`}
             />
             {errors.aboutMe && (
               <p className="text-xs text-rose-500 flex items-center gap-1">
@@ -280,7 +279,7 @@ export default function EditLifestylePage() {
           </div>
 
           {/* Occupation / Profession */}
-          <div className="space-y-1.5">
+          {/* <div className="space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <Briefcase className="w-3.5 h-3.5 text-rose-500" />
               <span>Profession / Job Title</span>
@@ -292,7 +291,7 @@ export default function EditLifestylePage() {
               placeholder="e.g. Software Engineer, Product Designer, Entrepreneur"
               className="w-full px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-rose-500"
             />
-          </div>
+          </div> */}
 
           {/* Bottom Action Buttons */}
           <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2 sm:gap-3">

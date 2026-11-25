@@ -179,17 +179,13 @@ export default function ContactUsPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="flex-1">
-        {/* Header Banner */}
-        <section className="relative py-16 sm:py-24 px-4 text-center overflow-hidden bg-gradient-to-b from-rose-50/70 via-white to-white dark:from-zinc-900/60 dark:via-zinc-950 dark:to-zinc-950 border-b border-zinc-100 dark:border-zinc-900">
-          <div className="max-w-4xl mx-auto space-y-4">
-            <h1 className="text-4xl sm:text-6xl poppins-black tracking-tight text-zinc-900 dark:text-white">
-              We are Here to{" "}
-              <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 bg-clip-text text-transparent">
-                Help You
-              </span>
-            </h1>
-            <p className="text-base sm:text-lg poppins-regular text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              Have questions about your account, payment transactions, safety, or need assistance? Reach out through any of our official channels below.
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">GET IN TOUCH</span>
+            <h1>We’d love to hear from you.</h1>
+            <p>
+              Questions, feedback or partnership ideas? Send a note to the Prem Jodo team.
             </p>
           </div>
         </section>
@@ -210,9 +206,9 @@ export default function ContactUsPage() {
                         <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-100 dark:border-rose-500/20">
                           <Icon className="w-5 h-5" />
                         </div>
-                        <span className="text-[11px] poppins-medium text-zinc-500 dark:text-zinc-400">
+                        {/* <span className="text-[11px] poppins-medium text-zinc-500 dark:text-zinc-400">
                           {card.badge}
-                        </span>
+                        </span> */}
                       </div>
                       <h3 className="poppins-bold text-sm text-zinc-900 dark:text-white">
                         {card.title}

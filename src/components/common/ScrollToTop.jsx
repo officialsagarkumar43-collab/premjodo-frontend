@@ -30,8 +30,14 @@ export function ScrollToTop() {
     });
   };
 
-  // Hide in fixed user views
-  if (pathname === "/user" || pathname === "/user/" || pathname?.startsWith("/user/matches")) {
+  // Hide in fixed user views & text-chat
+  if (
+    pathname === "/user" ||
+    pathname === "/user/" ||
+    pathname?.startsWith("/user/matches") ||
+    pathname?.startsWith("/text-chat") ||
+    pathname?.startsWith("/guest-chat")
+  ) {
     return null;
   }
 

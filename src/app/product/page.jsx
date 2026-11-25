@@ -111,105 +111,88 @@ export default function ProductPage() {
       <Navbar onOpenAuth={openAuth} />
 
       <main className="product-page-main">
-        {/* Hero Section */}
-        <section className="product-hero-section">
-          <div
-            ref={heroRef}
-            className={`product-hero-inner scroll-reveal ${
-              isHeroVisible ? "is-revealed" : ""
-            }`}
-          >
-            <h1 className="product-hero-title">
-              {t("productPage.titlePrefix")}
-              <span className="product-title-gradient">
-                {t("productPage.titleHighlight")}
-              </span>
-            </h1>
-            <p className="product-hero-subtitle">
-              {t("productPage.subtitle")}
+        {/* Pagehead Matching Redesign Preview */}
+        <section className="pagehead">
+          <div className="wrap">
+            <span className="pill">THE PREM JODO EXPERIENCE</span>
+            <h1>Connection, without the noise.</h1>
+            <p>
+              Thoughtful discovery, meaningful conversations and tools that let you date at your own pace.
             </p>
+          </div>
+        </section>
 
-            <div className="product-hero-cta-wrap">
-              {isAuthenticated ? (
-                <Link
-                  href="/user"
-                  className="product-hero-cta-btn"
-                >
-                  <span>Explore Matches</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => openAuth("register")}
-                  className="product-hero-cta-btn"
-                >
-                  {t("productPage.joinCta")}
-                </button>
-              )}
+        {/* Split Section: Discover, Connect, Choose */}
+        <section className="section">
+          <div className="wrap split">
+            <div className="mock-photo" />
+            <div>
+              <div className="eyebrow">01 · Discover</div>
+              <h2 style={{ font: "700 36px 'Playfair Display', Georgia, serif", margin: "10px 0 14px", color: "var(--ink)" }}>
+                Meet beyond the profile.
+              </h2>
+              <p className="lead" style={{ marginBottom: "26px" }}>
+                Explore people, interests and intentions. Start with curiosity and let a conversation grow naturally.
+              </p>
+
+              <div className="eyebrow">02 · Connect</div>
+              <h2 style={{ font: "700 30px 'Playfair Display', Georgia, serif", margin: "10px 0 14px", color: "var(--ink)" }}>
+                Make space for a spark.
+              </h2>
+              <p className="lead" style={{ marginBottom: "26px" }}>
+                Move from introductions to conversations with clarity and confidence.
+              </p>
+
+              <div className="eyebrow">03 · Choose</div>
+              <h2 style={{ font: "700 30px 'Playfair Display', Georgia, serif", margin: "10px 0 14px", color: "var(--ink)" }}>
+                Your experience, your rules.
+              </h2>
+              <p className="lead">
+                Manage visibility and privacy settings to feel comfortable at every step.
+              </p>
+
+              <div style={{ marginTop: "32px" }}>
+                {isAuthenticated ? (
+                  <Link href="/user" className="btn">
+                    Explore matches →
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openAuth("register")}
+                    className="btn"
+                  >
+                    Join Prem Jodo
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Features Showcase */}
-        <section className="product-features-section">
-          <div className="container">
-            <div
-              ref={featuresRef}
-              className={`product-features-grid scroll-reveal ${
-                isFeaturesVisible ? "is-revealed" : ""
-              }`}
-            >
-              {productFeatures.map((feat, index) => {
-                const Icon = feat.icon;
-                return (
-                  <article key={index} className="product-feature-card">
-                    <div>
-                      <div className={`product-feature-icon-box ${feat.iconClass}`}>
-                        <Icon className="w-7 h-7" />
-                      </div>
-                      <h3 className="product-feature-title">
-                        {feat.title}
-                      </h3>
-                      <p className="product-feature-tagline">
-                        {feat.tagline}
-                      </p>
-                      <p className="product-feature-desc">
-                        {feat.description}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="product-stats-section">
-          <div className="container">
-            <div
-              ref={statsRef}
-              className={`product-stats-grid scroll-reveal ${
-                isStatsVisible ? "is-revealed" : ""
-              }`}
-            >
-              <div>
-                <p className="product-stat-number product-stat-color-rose">0%</p>
-                <p className="product-stat-label">{t("productPage.statSecurity", "Fake Profiles & Bots")}</p>
-              </div>
-              <div>
-                <p className="product-stat-number product-stat-color-amber">100%</p>
-                <p className="product-stat-label">{t("productPage.statVerified", "Selfie Verified")}</p>
-              </div>
-              <div>
-                <p className="product-stat-number product-stat-color-pink">24/7</p>
-                <p className="product-stat-label">{t("productPage.statSupport", "Safety & Support Desk")}</p>
-              </div>
-              <div>
-                <p className="product-stat-number product-stat-color-emerald">50+</p>
-                <p className="product-stat-label">{t("productPage.statCities", "Indian Cities")}</p>
-              </div>
+        {/* Designed around you - 3 Cards */}
+        <section className="section" style={{ background: "var(--cream)" }}>
+          <div className="wrap center">
+            <h2>Designed around you</h2>
+            <p className="sub">
+              Everything in Prem Jodo is designed with empathy, security, and true human connection.
+            </p>
+            <div className="cards">
+              <article className="card">
+                <div className="icon">♡</div>
+                <h3>Personal discovery</h3>
+                <p>Explore profiles at your own pace with genuine intentions.</p>
+              </article>
+              <article className="card">
+                <div className="icon">✉</div>
+                <h3>Better conversations</h3>
+                <p>Make room for authentic introductions without unwanted distractions.</p>
+              </article>
+              <article className="card">
+                <div className="icon">⌑</div>
+                <h3>Privacy controls</h3>
+                <p>Choose what feels right to share with full selective visibility.</p>
+              </article>
             </div>
           </div>
         </section>

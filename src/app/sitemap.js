@@ -13,6 +13,18 @@ export default function sitemap() {
       priority: 1.0,
     },
     {
+      url: `${siteUrl}/text-chat`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${siteUrl}/guest-chat`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       url: `${siteUrl}/events`,
       lastModified: now,
       changeFrequency: 'daily',
