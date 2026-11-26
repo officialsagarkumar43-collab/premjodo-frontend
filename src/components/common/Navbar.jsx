@@ -17,6 +17,7 @@ import {
   User,
   HeartHandshake,
   MessageCircle,
+  MessageSquareText,
   LogOut,
   Crown,
   ShoppingBag,
@@ -313,6 +314,18 @@ export function Navbar({ onOpenAuth }) {
               <ThemeToggle />
             </div>
 
+            {/* Random 1v1 Text Chat Shortcut - Desktop Only (After Mode Switch) */}
+            <Link
+              href="/text-chat"
+              className={`header-chat-btn ${
+                pathname === "/text-chat" || pathname === "/guest-chat" ? "active" : ""
+              }`}
+              title="Random 1v1 Text Chat"
+              aria-label="Random 1v1 Text Chat"
+            >
+              <MessageSquareText className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 hover:scale-110" />
+            </Link>
+
             {/* If Authenticated: My Account Dropdown / Icon */}
             {isAuthenticated ? (
               <div className="account-wrapper" ref={accountMenuRef}>
@@ -487,7 +500,7 @@ export function Navbar({ onOpenAuth }) {
               className="mobile-drawer-close-btn"
               aria-label="Close navigation menu"
             >
-              <X style={{ width: "1.25rem", height: "1.25rem" }} />
+              <X style={{ width: "1.125rem", height: "1.125rem" }} />
             </button>
           </div>
 
@@ -515,7 +528,7 @@ export function Navbar({ onOpenAuth }) {
             </div>
           )}
 
-          {/* Nav Items List */}
+          {/* Nav Items List (Chitchat Clean Style) */}
           <div className="mobile-drawer-body">
             {isAuthenticated && (
               <div className="mobile-auth-quick-links">
@@ -525,12 +538,9 @@ export function Navbar({ onOpenAuth }) {
                   className="mobile-nav-item"
                 >
                   <div className="mobile-nav-left">
-                    <div className="mobile-nav-icon-box">
-                      <HeartHandshake style={{ width: "1rem", height: "1rem" }} />
-                    </div>
-                    <span>Discover Matches</span>
+                    <HeartHandshake className="mobile-nav-icon" style={{ width: "1.15rem", height: "1.15rem" }} />
+                    <span className="mobile-nav-title">Discover Matches</span>
                   </div>
-                  <ChevronRight style={{ width: "1rem", height: "1rem", opacity: 0.5 }} />
                 </Link>
                 <Link
                   href="/user/matches"
@@ -538,12 +548,9 @@ export function Navbar({ onOpenAuth }) {
                   className="mobile-nav-item"
                 >
                   <div className="mobile-nav-left">
-                    <div className="mobile-nav-icon-box">
-                      <MessageCircle style={{ width: "1rem", height: "1rem" }} />
-                    </div>
-                    <span>Matches & Chats</span>
+                    <MessageCircle className="mobile-nav-icon" style={{ width: "1.15rem", height: "1.15rem" }} />
+                    <span className="mobile-nav-title">Matches & Chats</span>
                   </div>
-                  <ChevronRight style={{ width: "1rem", height: "1rem", opacity: 0.5 }} />
                 </Link>
                 <Link
                   href="/user/profile"
@@ -551,12 +558,9 @@ export function Navbar({ onOpenAuth }) {
                   className="mobile-nav-item"
                 >
                   <div className="mobile-nav-left">
-                    <div className="mobile-nav-icon-box">
-                      <User style={{ width: "1rem", height: "1rem" }} />
-                    </div>
-                    <span>My Profile</span>
+                    <User className="mobile-nav-icon" style={{ width: "1.15rem", height: "1.15rem" }} />
+                    <span className="mobile-nav-title">My Profile</span>
                   </div>
-                  <ChevronRight style={{ width: "1rem", height: "1rem", opacity: 0.5 }} />
                 </Link>
               </div>
             )}
@@ -574,18 +578,68 @@ export function Navbar({ onOpenAuth }) {
                   className={`mobile-nav-item ${isActive ? "active" : ""}`}
                 >
                   <div className="mobile-nav-left">
-                    <div className="mobile-nav-icon-box">
-                      <Icon style={{ width: "1rem", height: "1rem" }} />
-                    </div>
-                    <span>{item.label}</span>
+                    <Icon className="mobile-nav-icon" style={{ width: "1.15rem", height: "1.15rem" }} />
+                    <span className="mobile-nav-title">{item.label}</span>
                   </div>
-                  <div className="mobile-nav-right">
-                    {isSoon && <span className="badge-soon">Soon</span>}
-                    <ChevronRight style={{ width: "1rem", height: "1rem", opacity: 0.6 }} />
-                  </div>
+                  {isSoon && <span className="badge-soon">Soon</span>}
                 </Link>
               );
             })}
+          </div>
+
+          {/* Drawer Footer with Chitchat Style CTAs */}
+          <div className="mobile-drawer-footer">
+            <div className="mobile-drawer-cta-group">
+              <Link
+                href="/text-chat"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="mobile-drawer-cta-btn mobile-drawer-cta-primary"
+              >
+                <MessageSquareText style={{ width: "1.125rem", height: "1.125rem" }} />
+                <span>Random Text Chat</span>
+              </Link>
+            </div>
+
+            <div className="mobile-drawer-footer-actions">
+              {/* Theme Toggle Button */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="mobile-footer-pill-btn"
+                title="Toggle Theme"
+              >
+                {resolvedTheme === "dark" ? (
+                  <>
+                    <Sun style={{ width: "0.9375rem", height: "0.9375rem", color: "#f59e0b" }} />
+                    <span>Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon style={{ width: "0.9375rem", height: "0.9375rem", color: "#6366f1" }} />
+                    <span>Dark Mode</span>
+                  </>
+                )}
+              </button>
+
+              {/* Language Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsLangOpen(true);
+                }}
+                className="mobile-footer-pill-btn"
+                title="Change Language"
+              >
+                <Globe style={{ width: "0.9375rem", height: "0.9375rem", color: "#ec4899" }} />
+                <span>{currentLangObj?.name || "English"}</span>
+              </button>
+            </div>
+
+
+            <p className="mobile-footer-brand-tag">
+              Prem Jodo • Made with ❤️ in India
+            </p>
           </div>
         </aside>
       </div>
